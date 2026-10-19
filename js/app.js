@@ -1,37 +1,42 @@
 // LUXE LABEL - Main Application Logic & Event Controller
+// Coordinates Homepage sections, Catalog filtering, Product details, Shopping bag, Wishlist, Checkout, and Policy Modals.
 
 const App = {
-  activeModalProductId: null,
-  activeModalSize: null,
-  activeModalQty: 1,
+  activeDetailProductId: null,
+  activeDetailSize: null,
+  activeDetailColor: null,
+  activeDetailQty: 1,
   checkoutStep: 1,
 
   // --- Initialize Application ---
   init() {
-    // 1. Initial renders
+    // 1. Initial Renders
     UI.renderCatalog('catalogGrid');
+    UI.renderNewArrivals();
+    UI.renderTrending();
+    UI.renderBestSellers();
     UI.renderCartDrawer();
     UI.renderWishlistDrawer();
 
-    // 2. Subscribe store updates
+    // 2. Subscribe to State Changes
     luxeStore.subscribe(() => {
       UI.renderCatalog('catalogGrid');
       UI.renderCartDrawer();
       UI.renderWishlistDrawer();
     });
 
-    // 3. Setup event listeners
+    // 3. Setup Listeners & Routing
     this.setupEventListeners();
-    this.setupScrollEffects();
+    this.setupHistoryRouting();
   },
 
   // --- Setup Event Listeners ---
   setupEventListeners() {
-    // Header scroll background toggle
+    // Sticky header shadow on scroll
     window.addEventListener('scroll', () => {
       const header = document.getElementById('siteHeader');
       if (header) {
-        if (window.scrollY > 40) {
+        if (window.scrollY > 30) {
           header.classList.add('scrolled');
         } else {
           header.classList.remove('scrolled');
@@ -39,18 +44,18 @@ const App = {
       }
     });
 
-    // Keyboard shortcuts (Escape closes drawers & modals, '/' opens search)
+    // Keyboard Shortcuts (/ for Search, Escape for Close)
     window.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         this.closeAllDrawersAndModals();
       }
-      if (e.key === '/' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+      if (e.key === '/' && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) {
         e.preventDefault();
         this.openSearch();
       }
     });
 
-    // Live search input in catalog
+    // Catalog Live Search Input
     const catalogSearchInput = document.getElementById('catalogSearchInput');
     if (catalogSearchInput) {
       catalogSearchInput.addEventListener('input', (e) => {
@@ -58,7 +63,7 @@ const App = {
       });
     }
 
-    // Sort select
+    // Catalog Sort Select
     const catalogSortSelect = document.getElementById('catalogSortSelect');
     if (catalogSortSelect) {
       catalogSortSelect.addEventListener('change', (e) => {
@@ -66,41 +71,35 @@ const App = {
       });
     }
 
-    // Modal Search Input
+    // Modal Live Search Input
     const searchModalInput = document.getElementById('searchModalInput');
     if (searchModalInput) {
       searchModalInput.addEventListener('input', (e) => {
         this.handleSearchModalInput(e.target.value);
       });
+      searchModalInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          const firstHit = document.querySelector('.search-hit-card');
+          if (firstHit) firstHit.click();
+        }
+      });
     }
 
-    // Newsletter Form
+    // Newsletter Gazette Form
     const newsletterForm = document.getElementById('newsletterForm');
     if (newsletterForm) {
       newsletterForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const input = document.getElementById('newsletterEmail');
         if (input && input.value.trim()) {
-          UI.showToast(`Thank you for subscribing to Luxe Label Private Gazette.`);
+          luxeStore.subscribeNewsletter(input.value.trim());
+          UI.showToast(`Welcome to the Private Gazette. Discretion assured.`);
           input.value = '';
         }
       });
     }
 
-    // Contact Form
-    const contactForm = document.getElementById('contactForm');
-    if (contactForm) {
-      contactForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        UI.showToast(`Your private stylist appointment inquiry has been received.`);
-        this.closeContactModal();
-        contactForm.reset();
-      });
-    }
-  },
-
-  setupScrollEffects() {
-    // Smooth scroll anchors
+    // Smooth Scroll Anchors
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
       anchor.addEventListener('click', function(e) {
         const targetId = this.getAttribute('href');
@@ -115,33 +114,56 @@ const App = {
     });
   },
 
-  // --- Category Filters ---
-  handleCategoryFilter(category, btnElement) {
-    document.querySelectorAll('.filter-pill').forEach(btn => btn.classList.remove('active'));
-    if (btnElement) {
-      btnElement.classList.add('active');
-    }
+  // --- URL Routing / Hash History ---
+  setupHistoryRouting() {
+    window.addEventListener('popstate', (e) => {
+      if (e.state && e.state.productId) {
+        this.openProductDetail(e.state.productId, false);
+      } else {
+        this.closeProductDetail(false);
+      }
+    });
 
-    if (['women', 'men'].includes(category.toLowerCase())) {
-      luxeStore.setFilter('category', 'all');
-      luxeStore.setFilter('gender', category);
-    } else {
-      luxeStore.setFilter('gender', 'all');
-      luxeStore.setFilter('category', category);
+    // Check if initial URL has hash (e.g. #product-luxe-01)
+    if (window.location.hash.startsWith('#product-')) {
+      const prodId = window.location.hash.replace('#product-', '');
+      this.openProductDetail(prodId, false);
     }
   },
 
-  resetCatalogFilters() {
+  // --- Catalog Filters ---
+  handleDepartmentFilter(dept, btnElement) {
+    document.querySelectorAll('.dept-tab').forEach(b => b.classList.remove('active'));
+    if (btnElement) btnElement.classList.add('active');
+    luxeStore.setFilter('department', dept);
+    this.scrollToCatalog();
+  },
+
+  handleCategoryFilter(cat, btnElement) {
+    document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+    if (btnElement) btnElement.classList.add('active');
+    luxeStore.setFilter('category', cat);
+    this.scrollToCatalog();
+  },
+
+  handleSizeFilter(size, chipElement) {
+    document.querySelectorAll('.size-chip').forEach(c => c.classList.remove('active'));
+    if (chipElement) chipElement.classList.add('active');
+    luxeStore.setFilter('size', size);
+  },
+
+  handleSaleFilterToggle(checkbox) {
+    luxeStore.setFilter('saleOnly', checkbox.checked);
+  },
+
+  resetAllFilters() {
     luxeStore.resetFilters();
-    const pills = document.querySelectorAll('.filter-pill');
-    pills.forEach(p => p.classList.remove('active'));
-    if (pills[0]) pills[0].classList.add('active');
-
-    const searchInput = document.getElementById('catalogSearchInput');
-    if (searchInput) searchInput.value = '';
-
-    const sortSelect = document.getElementById('catalogSortSelect');
-    if (sortSelect) sortSelect.value = 'featured';
+    document.querySelectorAll('.filter-tab').forEach((b, idx) => b.classList.toggle('active', idx === 0));
+    document.querySelectorAll('.size-chip').forEach((c, idx) => c.classList.toggle('active', idx === 0));
+    const searchField = document.getElementById('catalogSearchInput');
+    if (searchField) searchField.value = '';
+    const sortField = document.getElementById('catalogSortSelect');
+    if (sortField) sortField.value = 'featured';
   },
 
   scrollToCatalog() {
@@ -151,7 +173,7 @@ const App = {
     }
   },
 
-  // --- Cart Drawer Actions ---
+  // --- Shopping Bag (Cart) Actions ---
   openCart() {
     this.closeWishlist();
     this.closeMobileNav();
@@ -170,32 +192,28 @@ const App = {
     document.body.classList.remove('modal-open');
   },
 
-  handleQuickAdd(productId) {
+  handleCardQuickAdd(productId) {
     const product = PRODUCTS_DATA.find(p => p.id === productId);
     if (!product) return;
-
     const defaultSize = product.sizes[0];
-    luxeStore.addToCart(product, defaultSize, 1);
-    UI.showToast(`"${product.name}" added to your Shopping Bag.`);
+    const defaultColor = product.colors && product.colors.length ? product.colors[0].name : 'Standard';
+    
+    const res = luxeStore.addToCart(product, defaultSize, defaultColor, 1);
+    UI.showToast(`Added "${product.name}" (${defaultSize} / ${defaultColor}) to Bag.`);
     this.openCart();
   },
 
-  handleCartQty(productId, size, newQty) {
-    luxeStore.updateQuantity(productId, size, newQty);
+  handleCartQuantity(variantId, newQty) {
+    luxeStore.updateQuantity(variantId, newQty);
   },
 
-  handleCartRemove(productId, size) {
-    luxeStore.removeFromCart(productId, size);
+  handleCartRemove(variantId) {
+    luxeStore.removeFromCart(variantId);
     UI.showToast('Item removed from your Shopping Bag.');
   },
 
-  handleGiftBoxToggle(checked) {
-    luxeStore.setGiftBox(checked);
-    UI.showToast(checked ? 'Signature Luxury Packaging added.' : 'Luxury Packaging removed.');
-  },
-
   handleApplyPromo() {
-    const input = document.getElementById('promoInput');
+    const input = document.getElementById('promoCodeInput');
     if (!input) return;
     const result = luxeStore.applyPromoCode(input.value);
     UI.showToast(result.message);
@@ -228,90 +246,124 @@ const App = {
   handleToggleWishlist(productId) {
     const product = PRODUCTS_DATA.find(p => p.id === productId);
     const added = luxeStore.toggleWishlist(productId);
-    UI.showToast(added ? `"${product.name}" added to your Wishlist.` : `"${product.name}" removed from your Wishlist.`);
+    UI.showToast(added ? `"${product.name}" saved to your Wishlist.` : `"${product.name}" removed from your Wishlist.`);
   },
 
   handleMoveWishlistToBag(productId) {
     const product = PRODUCTS_DATA.find(p => p.id === productId);
     if (!product) return;
-    luxeStore.addToCart(product, product.sizes[0], 1);
+    const defaultSize = product.sizes[0];
+    const defaultColor = product.colors && product.colors.length ? product.colors[0].name : 'Standard';
+
+    luxeStore.addToCart(product, defaultSize, defaultColor, 1);
     luxeStore.toggleWishlist(productId);
     UI.showToast(`"${product.name}" moved to your Shopping Bag.`);
     this.openCart();
   },
 
-  // --- Quick View & Product Detail Modal ---
-  openQuickView(productId) {
+  // --- Product Detail Modal ---
+  openProductDetail(productId, pushHistory = true) {
     const product = PRODUCTS_DATA.find(p => p.id === productId);
     if (!product) return;
 
-    this.activeModalProductId = productId;
-    this.activeModalSize = product.sizes[0];
-    this.activeModalQty = 1;
+    this.activeDetailProductId = productId;
+    this.activeDetailSize = product.sizes[0];
+    this.activeDetailColor = product.colors && product.colors.length ? product.colors[0].name : 'Standard';
+    this.activeDetailQty = 1;
 
-    UI.renderProductModal(product, this.activeModalSize);
+    UI.renderProductModal(product, this.activeDetailSize, this.activeDetailColor);
 
-    const modalBackdrop = document.getElementById('productModalBackdrop');
-    if (modalBackdrop) modalBackdrop.classList.add('active');
+    const modal = document.getElementById('productDetailModalOverlay');
+    if (modal) modal.classList.add('active');
     document.body.classList.add('modal-open');
 
     luxeStore.addRecentlyViewed(productId);
-  },
 
-  closeQuickView() {
-    const modalBackdrop = document.getElementById('productModalBackdrop');
-    if (modalBackdrop) modalBackdrop.classList.remove('active');
-    document.body.classList.remove('modal-open');
-  },
-
-  changeModalImage(src, thumbElement) {
-    const mainImg = document.getElementById('modalMainImage');
-    if (mainImg) mainImg.src = src;
-
-    document.querySelectorAll('.modal-thumb').forEach(el => el.classList.remove('active'));
-    if (thumbElement) thumbElement.classList.add('active');
-  },
-
-  selectModalSize(productId, size) {
-    this.activeModalSize = size;
-    document.querySelectorAll('.modal-size-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.textContent.trim() === size);
-    });
-  },
-
-  incrementModalQty() {
-    this.activeModalQty++;
-    const display = document.getElementById('modalQtyDisplay');
-    if (display) display.textContent = this.activeModalQty;
-  },
-
-  decrementModalQty() {
-    if (this.activeModalQty > 1) {
-      this.activeModalQty--;
-      const display = document.getElementById('modalQtyDisplay');
-      if (display) display.textContent = this.activeModalQty;
+    if (pushHistory) {
+      window.history.pushState({ productId: productId }, `LUXE LABEL | ${product.name}`, `#product-${productId}`);
     }
   },
 
-  handleAddModalToBag(productId) {
+  closeProductDetail(popHistory = true) {
+    const modal = document.getElementById('productDetailModalOverlay');
+    if (modal) modal.classList.remove('active');
+    document.body.classList.remove('modal-open');
+
+    if (popHistory && window.location.hash.startsWith('#product-')) {
+      window.history.pushState({}, 'LUXE LABEL', window.location.pathname);
+    }
+  },
+
+  switchDetailThumb(imgSrc, thumbElement) {
+    const main = document.getElementById('detailMainImage');
+    if (main) main.src = imgSrc;
+    document.querySelectorAll('.detail-thumb-img').forEach(t => t.classList.remove('active'));
+    if (thumbElement) thumbElement.classList.add('active');
+  },
+
+  selectDetailColor(productId, colorName) {
+    this.activeDetailColor = colorName;
+    const label = document.getElementById('activeColorName');
+    if (label) label.textContent = colorName;
+    document.querySelectorAll('.color-swatch-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.getAttribute('title') === colorName);
+    });
+  },
+
+  selectDetailSize(productId, sizeName) {
+    this.activeDetailSize = sizeName;
+    const label = document.getElementById('activeSizeName');
+    if (label) label.textContent = sizeName;
+    document.querySelectorAll('.detail-size-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.textContent.trim() === sizeName);
+    });
+  },
+
+  incrementDetailQty() {
+    this.activeDetailQty++;
+    const display = document.getElementById('detailQtyDisplay');
+    if (display) display.textContent = this.activeDetailQty;
+  },
+
+  decrementDetailQty() {
+    if (this.activeDetailQty > 1) {
+      this.activeDetailQty--;
+      const display = document.getElementById('detailQtyDisplay');
+      if (display) display.textContent = this.activeDetailQty;
+    }
+  },
+
+  handleDetailAddToBag(productId) {
     const product = PRODUCTS_DATA.find(p => p.id === productId);
     if (!product) return;
 
-    const size = this.activeModalSize || product.sizes[0];
-    const qty = this.activeModalQty || 1;
+    if (!this.activeDetailSize) {
+      UI.showToast("Please choose a size before adding to bag.");
+      return;
+    }
 
-    luxeStore.addToCart(product, size, qty);
-    this.closeQuickView();
-    UI.showToast(`Added ${qty}x "${product.name}" (${size}) to your Shopping Bag.`);
+    const res = luxeStore.addToCart(product, this.activeDetailSize, this.activeDetailColor, this.activeDetailQty);
+    this.closeProductDetail();
+    UI.showToast(`Added ${this.activeDetailQty}x "${product.name}" (${this.activeDetailSize} / ${this.activeDetailColor}) to your Bag.`);
     this.openCart();
+  },
+
+  handleCheckPin() {
+    const input = document.getElementById('detailPinInput');
+    const resultBox = document.getElementById('detailPinResult');
+    if (!input || !resultBox) return;
+
+    const res = luxeStore.checkDeliveryPincode(input.value);
+    resultBox.textContent = res.message;
+    resultBox.style.color = res.valid ? 'var(--color-success)' : 'var(--color-sale)';
   },
 
   // --- Search Overlay Modal ---
   openSearch() {
     this.closeAllDrawersAndModals();
-    const modal = document.getElementById('searchModalBackdrop');
-    if (modal) {
-      modal.classList.add('active');
+    const overlay = document.getElementById('searchOverlay');
+    if (overlay) {
+      overlay.classList.add('active');
       document.body.classList.add('modal-open');
       const input = document.getElementById('searchModalInput');
       if (input) {
@@ -323,96 +375,451 @@ const App = {
   },
 
   closeSearch() {
-    const modal = document.getElementById('searchModalBackdrop');
-    if (modal) modal.classList.remove('active');
+    const overlay = document.getElementById('searchOverlay');
+    if (overlay) overlay.classList.remove('active');
     document.body.classList.remove('modal-open');
   },
 
   handleSearchModalInput(query) {
-    const resultsContainer = document.getElementById('searchResultsList');
-    if (!resultsContainer) return;
+    const list = document.getElementById('searchResultsList');
+    if (!list) return;
 
     const q = (query || '').toLowerCase().trim();
-    let matches = PRODUCTS_DATA;
+    let hits = PRODUCTS_DATA;
 
     if (q) {
-      matches = PRODUCTS_DATA.filter(item => 
+      hits = PRODUCTS_DATA.filter(item => 
         item.name.toLowerCase().includes(q) ||
         item.category.toLowerCase().includes(q) ||
+        item.department.toLowerCase().includes(q) ||
         item.fabric.toLowerCase().includes(q) ||
         item.tags.some(t => t.toLowerCase().includes(q))
       );
     } else {
-      // Default to 4 trending items when empty
-      matches = PRODUCTS_DATA.slice(0, 4);
+      // Default to 4 trending items
+      hits = PRODUCTS_DATA.slice(0, 4);
     }
 
-    if (matches.length === 0) {
-      resultsContainer.innerHTML = `
-        <div style="text-align: center; color: rgba(255,255,255,0.6); padding: 2rem;">
+    if (hits.length === 0) {
+      list.innerHTML = `
+        <div style="text-align: center; color: rgba(255, 255, 255, 0.6); padding: 3rem 1rem;">
           No bespoke garments found matching "${query}".
         </div>
       `;
       return;
     }
 
-    resultsContainer.innerHTML = matches.map(p => `
-      <div class="search-result-item" onclick="App.selectSearchResult('${p.id}')">
-        <img class="search-result-img" src="${p.primaryImage}" alt="${p.name}" />
+    list.innerHTML = hits.map(p => `
+      <div class="search-hit-card" onclick="App.selectSearchResult('${p.id}')">
+        <img class="search-hit-img" src="${p.primaryImage}" alt="${p.name}" />
         <div>
-          <div class="search-result-name">${p.name}</div>
-          <div style="font-size: 0.72rem; color: rgba(255,255,255,0.6); text-transform: uppercase;">${p.category} &bull; ${p.gender}</div>
+          <div class="search-hit-name">${p.name}</div>
+          <div style="font-size: 0.72rem; color: rgba(255,255,255,0.6); text-transform: uppercase;">
+            ${p.category} &bull; ${p.department}
+          </div>
         </div>
-        <div class="search-result-price">${formatINR(p.price)}</div>
+        <div class="search-hit-price">${formatINR(p.price)}</div>
       </div>
     `).join('');
   },
 
   selectSearchResult(productId) {
     this.closeSearch();
-    this.openQuickView(productId);
+    this.openProductDetail(productId);
   },
 
-  handleSearchTag(tagText) {
+  setSearchKeyword(keyword) {
     const input = document.getElementById('searchModalInput');
     if (input) {
-      input.value = tagText;
-      this.handleSearchModalInput(tagText);
+      input.value = keyword;
+      this.handleSearchModalInput(keyword);
     }
   },
 
-  // --- Size Guide Modal ---
-  openSizeGuide() {
-    const modal = document.getElementById('sizeGuideModalBackdrop');
-    if (modal) {
-      modal.classList.add('active');
-      document.body.classList.add('modal-open');
+  // --- Demo Multi-Step Checkout Modal ---
+  openCheckout() {
+    if (luxeStore.cart.length === 0) {
+      UI.showToast("Your shopping bag is empty.");
+      return;
     }
+    this.closeCart();
+    this.checkoutStep = 1;
+    this.renderCheckoutStep();
+
+    const modal = document.getElementById('checkoutModalOverlay');
+    if (modal) modal.classList.add('active');
+    document.body.classList.add('modal-open');
   },
 
-  closeSizeGuide() {
-    const modal = document.getElementById('sizeGuideModalBackdrop');
+  closeCheckout() {
+    const modal = document.getElementById('checkoutModalOverlay');
     if (modal) modal.classList.remove('active');
     document.body.classList.remove('modal-open');
   },
 
-  // --- Contact / Private Appointment Modal ---
-  openContactModal() {
+  renderCheckoutStep() {
+    const body = document.getElementById('checkoutModalBody');
+    const pill1 = document.getElementById('chkStepPill1');
+    const pill2 = document.getElementById('chkStepPill2');
+    const pill3 = document.getElementById('chkStepPill3');
+
+    if (!body) return;
+
+    if (pill1) pill1.classList.toggle('active', this.checkoutStep >= 1);
+    if (pill2) pill2.classList.toggle('active', this.checkoutStep >= 2);
+    if (pill3) pill3.classList.toggle('active', this.checkoutStep >= 3);
+
+    const total = luxeStore.getCartTotal();
+
+    if (this.checkoutStep === 1) {
+      body.innerHTML = `
+        <form id="checkoutShippingForm" onsubmit="event.preventDefault(); App.proceedToPaymentStep();">
+          <h3 class="serif-heading" style="font-size: 1.8rem; margin-bottom: 0.5rem;">White-Glove Delivery Details</h3>
+          <p style="font-size: 0.8rem; color: var(--color-text-muted); margin-bottom: 1.5rem;">
+            Please provide your Indian residential address for courier dispatch.
+          </p>
+
+          <div class="checkout-fields-grid">
+            <div>
+              <label class="checkout-label">First Name *</label>
+              <input type="text" class="checkout-input" required value="Devika" />
+            </div>
+            <div>
+              <label class="checkout-label">Last Name *</label>
+              <input type="text" class="checkout-input" required value="Singhania" />
+            </div>
+            <div class="form-full">
+              <label class="checkout-label">Email Address (for order updates) *</label>
+              <input type="email" class="checkout-input" required value="devika.singhania@domain.com" />
+            </div>
+            <div class="form-full">
+              <label class="checkout-label">Contact Phone (+91) *</label>
+              <input type="tel" class="checkout-input" required value="9820012345" />
+            </div>
+            <div class="form-full">
+              <label class="checkout-label">Street Address / Residence *</label>
+              <input type="text" class="checkout-input" required value="Flat 14A, Sea Face Chambers, Worli" />
+            </div>
+            <div>
+              <label class="checkout-label">City *</label>
+              <input type="text" class="checkout-input" required value="Mumbai" />
+            </div>
+            <div>
+              <label class="checkout-label">State *</label>
+              <input type="text" class="checkout-input" required value="Maharashtra" />
+            </div>
+            <div>
+              <label class="checkout-label">PIN / Postal Code *</label>
+              <input type="text" class="checkout-input" required value="400018" maxlength="6" />
+            </div>
+            <div>
+              <label class="checkout-label">Delivery Instructions</label>
+              <input type="text" class="checkout-input" placeholder="e.g. Leave with security desk" />
+            </div>
+          </div>
+
+          <div style="margin-top: 2rem; display: flex; justify-content: space-between; align-items: center;">
+            <button type="button" class="btn btn-secondary" onclick="App.closeCheckout()">Return to Bag</button>
+            <button type="submit" class="btn btn-primary">
+              Continue to Payment &bull; ${formatINR(total)}
+            </button>
+          </div>
+        </form>
+      `;
+    } else if (this.checkoutStep === 2) {
+      body.innerHTML = `
+        <div>
+          <h3 class="serif-heading" style="font-size: 1.8rem; margin-bottom: 0.5rem;">Payment Privilege (Demo)</h3>
+          <p style="font-size: 0.8rem; color: var(--color-text-muted); margin-bottom: 1.5rem;">
+            FRONTEND DEMO ONLY: No real cards or bank credentials requested. Selection simulates payment authorization.
+          </p>
+
+          <div class="demo-payment-grid">
+            <div class="demo-pay-tile active" onclick="App.selectPayMethod(this)">
+              <input type="radio" name="payMethod" checked />
+              <div>
+                <div class="demo-pay-title">Instant UPI & QR</div>
+                <div class="demo-pay-desc">Google Pay, PhonePe, Paytm, BHIM</div>
+              </div>
+            </div>
+
+            <div class="demo-pay-tile" onclick="App.selectPayMethod(this)">
+              <input type="radio" name="payMethod" />
+              <div>
+                <div class="demo-pay-title">Demo Card Privilege</div>
+                <div class="demo-pay-desc">Visa, Mastercard, Amex (Simulated)</div>
+              </div>
+            </div>
+
+            <div class="demo-pay-tile" onclick="App.selectPayMethod(this)">
+              <input type="radio" name="payMethod" />
+              <div>
+                <div class="demo-pay-title">Private NetBanking</div>
+                <div class="demo-pay-desc">HDFC, ICICI, Axis, SBI Wealth</div>
+              </div>
+            </div>
+
+            <div class="demo-pay-tile" onclick="App.selectPayMethod(this)">
+              <input type="radio" name="payMethod" />
+              <div>
+                <div class="demo-pay-title">Cash on Delivery (COD)</div>
+                <div class="demo-pay-desc">Pay upon white-glove arrival</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="background-color: var(--color-bg); padding: 1.25rem; border: 1px solid var(--color-border); margin-bottom: 2rem;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem; font-size: 0.82rem;">
+              <span>Bag Items (${luxeStore.getCartCount()}):</span>
+              <strong>${formatINR(luxeStore.getCartSubtotal())}</strong>
+            </div>
+            ${luxeStore.getDiscountAmount() > 0 ? `
+              <div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem; font-size: 0.82rem; color: var(--color-success);">
+                <span>Privilege Discount:</span>
+                <strong>-${formatINR(luxeStore.getDiscountAmount())}</strong>
+              </div>
+            ` : ''}
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem; font-size: 0.82rem;">
+              <span>White-Glove Shipping:</span>
+              <strong>${luxeStore.getShippingCost() === 0 ? 'FREE' : formatINR(luxeStore.getShippingCost())}</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding-top: 0.75rem; border-top: 1px solid var(--color-border); font-size: 1.15rem; font-weight: 600;">
+              <span>Total Payable:</span>
+              <span>${formatINR(total)}</span>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <button type="button" class="btn btn-secondary" onclick="App.checkoutStep = 1; App.renderCheckoutStep();">Back</button>
+            <button type="button" class="btn btn-primary" id="btnPlaceDemoOrder" onclick="App.completeDemoCheckout()">
+              Authorize & Place Demo Order
+            </button>
+          </div>
+        </div>
+      `;
+    } else if (this.checkoutStep === 3) {
+      const orderRef = `LX-${Math.floor(100000 + Math.random() * 900000)}`;
+      const deliveryDate = new Date();
+      deliveryDate.setDate(deliveryDate.getDate() + 3);
+      const formattedDate = deliveryDate.toLocaleDateString('en-IN', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+
+      body.innerHTML = `
+        <div class="checkout-success-pane">
+          <div class="success-badge-icon">${UI.icons.check}</div>
+          <span class="eyebrow-label">Order Confirmed</span>
+          <h2 class="serif-heading" style="font-size: 2.2rem; margin-bottom: 0.5rem;">Thank You For Your Patronage</h2>
+          <div class="order-ref-tag">ORDER REFERENCE: ${orderRef}</div>
+
+          <p style="font-size: 0.88rem; color: var(--color-text-muted); max-width: 480px; margin: 0 auto 2rem; line-height: 1.6;">
+            A confirmation receipt and courier tracking dossier have been prepared for your atelier order.
+          </p>
+
+          <div style="background-color: var(--color-bg); padding: 1.25rem; border: 1px solid var(--color-border); text-align: left; max-width: 500px; margin: 0 auto 2rem; font-size: 0.82rem; line-height: 1.8;">
+            <div style="display: flex; justify-content: space-between;">
+              <span>Estimated Delivery:</span>
+              <strong>${formattedDate}</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span>Courier Protocol:</span>
+              <span>White-Glove Insured Delivery</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span>Payment Status:</span>
+              <span style="color: var(--color-success); font-weight: 600;">Authorized (Demo)</span>
+            </div>
+          </div>
+
+          <button class="btn btn-primary" onclick="App.closeCheckout(); App.scrollToCatalog();">
+            Continue Exploring Collection
+          </button>
+        </div>
+      `;
+
+      // Clear the cart on successful order placement
+      luxeStore.clearCart();
+    }
+  },
+
+  proceedToPaymentStep() {
+    this.checkoutStep = 2;
+    this.renderCheckoutStep();
+  },
+
+  selectPayMethod(tile) {
+    document.querySelectorAll('.demo-pay-tile').forEach(t => t.classList.remove('active'));
+    tile.classList.add('active');
+    const radio = tile.querySelector('input[type="radio"]');
+    if (radio) radio.checked = true;
+  },
+
+  completeDemoCheckout() {
+    const btn = document.getElementById('btnPlaceDemoOrder');
+    if (btn) {
+      btn.innerHTML = `Authorizing Atelier Order...`;
+      btn.disabled = true;
+    }
+
+    setTimeout(() => {
+      this.checkoutStep = 3;
+      this.renderCheckoutStep();
+      UI.showToast("Order placed successfully! Thank you for choosing LUXE LABEL.");
+    }, 1000);
+  },
+
+  // --- Policy & Informational Modals ---
+  openPolicyModal(type) {
     this.closeAllDrawersAndModals();
-    const modal = document.getElementById('contactModalBackdrop');
-    if (modal) {
-      modal.classList.add('active');
-      document.body.classList.add('modal-open');
+    const modal = document.getElementById('policyModalOverlay');
+    const body = document.getElementById('policyModalBody');
+    if (!modal || !body) return;
+
+    let title = 'Information';
+    let content = '';
+
+    switch (type) {
+      case 'faq':
+        title = 'Frequently Asked Questions';
+        content = `
+          <div class="accordion-item">
+            <div class="accordion-header">How are LUXE LABEL garments crafted?</div>
+            <div class="accordion-body">Each creation is meticulously crafted in limited batches using natural fibers including Banarasi raw silk, Mongolian cashmere, and long-staple Giza cotton.</div>
+          </div>
+          <div class="accordion-item">
+            <div class="accordion-header">What are the delivery timelines?</div>
+            <div class="accordion-body">Metro cities receive orders within 2-3 business days. Non-metro locations are delivered within 4-5 business days via insured white-glove express courier.</div>
+          </div>
+          <div class="accordion-item">
+            <div class="accordion-header">Do you offer bespoke custom tailoring?</div>
+            <div class="accordion-body">Yes. We offer complimentary private alterations for all ceremonial outfits, tuxedos, and gowns through our atelier appointments in Mumbai and Delhi.</div>
+          </div>
+        `;
+        break;
+
+      case 'shipping':
+        title = 'Shipping & White-Glove Delivery';
+        content = `
+          <p style="font-size: 0.85rem; color: var(--color-text-muted); line-height: 1.8; margin-bottom: 1rem;">
+            LUXE LABEL provides complimentary white-glove express shipping on all domestic orders exceeding ₹2,999. Orders below ₹2,999 incur a nominal fee of ₹250.
+          </p>
+          <p style="font-size: 0.85rem; color: var(--color-text-muted); line-height: 1.8;">
+            Every garment is hand-pressed, wrapped in archival tissue paper, and delivered in our signature presentation box with tamper-evident serial seals.
+          </p>
+        `;
+        break;
+
+      case 'returns':
+        title = 'Complimentary 14-Day Returns';
+        content = `
+          <p style="font-size: 0.85rem; color: var(--color-text-muted); line-height: 1.8; margin-bottom: 1rem;">
+            We offer hassle-free 14-day door pickups for exchange or refund. Garments must be unworn, with all original security tags and garment bags intact.
+          </p>
+          <p style="font-size: 0.85rem; color: var(--color-text-muted); line-height: 1.8;">
+            Initiate a return by contacting our private concierge via email at concierge@luxelabel.com or through your account portal.
+          </p>
+        `;
+        break;
+
+      case 'privacy':
+        title = 'Privacy Discretion Policy';
+        content = `
+          <p style="font-size: 0.85rem; color: var(--color-text-muted); line-height: 1.8; margin-bottom: 1rem;">
+            At LUXE LABEL, patron discretion is absolute. We do not sell, rent, or share personal client information. All sensitive transactions are encrypted via 256-bit protocols.
+          </p>
+        `;
+        break;
+
+      case 'terms':
+        title = 'Terms & Conditions';
+        content = `
+          <p style="font-size: 0.85rem; color: var(--color-text-muted); line-height: 1.8; margin-bottom: 1rem;">
+            All creations displayed are subject to fabric availability. Bespoke alterations are final sale once customized to specific patron measurements.
+          </p>
+        `;
+        break;
+
+      case 'size-guide':
+        title = 'Atelier Measurement Matrix';
+        content = `
+          <p style="font-size: 0.82rem; color: var(--color-text-muted); margin-bottom: 1.25rem;">
+            Measurements in inches. For custom bespoke fittings, contact our private tailor.
+          </p>
+          <table style="width: 100%; border-collapse: collapse; font-size: 0.78rem;">
+            <thead>
+              <tr style="background: var(--color-bg); border-bottom: 1px solid var(--color-border); text-align: left;">
+                <th style="padding: 0.6rem;">Size</th>
+                <th style="padding: 0.6rem;">Bust / Chest</th>
+                <th style="padding: 0.6rem;">Waist</th>
+                <th style="padding: 0.6rem;">Hips</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom: 1px solid var(--color-border);">
+                <td style="padding: 0.6rem;"><strong>XS / 36</strong></td>
+                <td style="padding: 0.6rem;">32 - 34"</td>
+                <td style="padding: 0.6rem;">26 - 28"</td>
+                <td style="padding: 0.6rem;">35 - 37"</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--color-border);">
+                <td style="padding: 0.6rem;"><strong>S / 38</strong></td>
+                <td style="padding: 0.6rem;">35 - 37"</td>
+                <td style="padding: 0.6rem;">29 - 31"</td>
+                <td style="padding: 0.6rem;">38 - 40"</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--color-border);">
+                <td style="padding: 0.6rem;"><strong>M / 40</strong></td>
+                <td style="padding: 0.6rem;">38 - 40"</td>
+                <td style="padding: 0.6rem;">32 - 34"</td>
+                <td style="padding: 0.6rem;">41 - 43"</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--color-border);">
+                <td style="padding: 0.6rem;"><strong>L / 42</strong></td>
+                <td style="padding: 0.6rem;">41 - 43"</td>
+                <td style="padding: 0.6rem;">35 - 37"</td>
+                <td style="padding: 0.6rem;">44 - 46"</td>
+              </tr>
+              <tr>
+                <td style="padding: 0.6rem;"><strong>XL / 44</strong></td>
+                <td style="padding: 0.6rem;">44 - 46"</td>
+                <td style="padding: 0.6rem;">38 - 40"</td>
+                <td style="padding: 0.6rem;">47 - 49"</td>
+              </tr>
+            </tbody>
+          </table>
+        `;
+        break;
+
+      case 'contact':
+        title = 'Private Concierge & Salons';
+        content = `
+          <p style="font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 1.5rem;">
+            Visit our private flagship ateliers or schedule a virtual styling session with our creative directors.
+          </p>
+          <div style="font-size: 0.82rem; line-height: 1.8;">
+            <div><strong>The Mumbai Salon:</strong> Altamount Road, Cumballa Hill, Mumbai 400026</div>
+            <div><strong>The Delhi Salon:</strong> Malcha Marg, Chanakyapuri, New Delhi 110021</div>
+            <div><strong>Telephone:</strong> +91 (022) 8800-LUXE (9am - 8pm IST)</div>
+            <div><strong>Concierge Email:</strong> concierge@luxelabel.com</div>
+          </div>
+        `;
+        break;
     }
+
+    body.innerHTML = `
+      <h3 class="policy-modal-title">${title}</h3>
+      <div style="margin-top: 1.25rem;">${content}</div>
+    `;
+
+    modal.classList.add('active');
+    document.body.classList.add('modal-open');
   },
 
-  closeContactModal() {
-    const modal = document.getElementById('contactModalBackdrop');
+  closePolicyModal() {
+    const modal = document.getElementById('policyModalOverlay');
     if (modal) modal.classList.remove('active');
     document.body.classList.remove('modal-open');
   },
 
-  // --- Mobile Navigation Drawer ---
+  // --- Mobile Navigation ---
   openMobileNav() {
     this.closeCart();
     this.closeWishlist();
@@ -431,246 +838,19 @@ const App = {
     document.body.classList.remove('modal-open');
   },
 
-  // --- Checkout Flow (Demo Multi-Step) ---
-  openCheckout() {
-    if (luxeStore.cart.length === 0) {
-      UI.showToast("Your shopping bag is empty.");
-      return;
-    }
-    this.closeCart();
-    this.checkoutStep = 1;
-    this.renderCheckoutStep();
-
-    const modal = document.getElementById('checkoutModalBackdrop');
-    if (modal) modal.classList.add('active');
-    document.body.classList.add('modal-open');
-  },
-
-  closeCheckout() {
-    const modal = document.getElementById('checkoutModalBackdrop');
-    if (modal) modal.classList.remove('active');
-    document.body.classList.remove('modal-open');
-  },
-
-  renderCheckoutStep() {
-    const body = document.getElementById('checkoutModalBody');
-    const indicator1 = document.getElementById('stepIndicator1');
-    const indicator2 = document.getElementById('stepIndicator2');
-    const indicator3 = document.getElementById('stepIndicator3');
-
-    if (!body) return;
-
-    if (indicator1) indicator1.classList.toggle('active', this.checkoutStep >= 1);
-    if (indicator2) indicator2.classList.toggle('active', this.checkoutStep >= 2);
-    if (indicator3) indicator3.classList.toggle('active', this.checkoutStep >= 3);
-
-    const total = luxeStore.getCartTotal();
-
-    if (this.checkoutStep === 1) {
-      body.innerHTML = `
-        <form id="shippingForm" onsubmit="event.preventDefault(); App.proceedToPayment();">
-          <h3 class="serif-font" style="font-size: 1.6rem; margin-bottom: 1.25rem;">White-Glove Delivery Address</h3>
-          <div class="checkout-form-grid">
-            <div class="form-group">
-              <label class="input-label">First Name *</label>
-              <input type="text" class="luxury-input" id="shipFirstName" required value="Aditi" />
-            </div>
-            <div class="form-group">
-              <label class="input-label">Last Name *</label>
-              <input type="text" class="luxury-input" id="shipLastName" required value="Mehra" />
-            </div>
-            <div class="form-group form-group-full">
-              <label class="input-label">Email Address (for order tracking) *</label>
-              <input type="email" class="luxury-input" id="shipEmail" required value="aditi.mehra@atelierluxe.com" />
-            </div>
-            <div class="form-group form-group-full">
-              <label class="input-label">Contact Phone (+91) *</label>
-              <input type="tel" class="luxury-input" id="shipPhone" required value="9876543210" />
-            </div>
-            <div class="form-group form-group-full">
-              <label class="input-label">Luxury Residence / Street Address *</label>
-              <input type="text" class="luxury-input" id="shipAddress" required value="Penthouse 4B, The Imperial Towers, Altamount Road" />
-            </div>
-            <div class="form-group">
-              <label class="input-label">City *</label>
-              <input type="text" class="luxury-input" id="shipCity" required value="Mumbai" />
-            </div>
-            <div class="form-group">
-              <label class="input-label">State *</label>
-              <input type="text" class="luxury-input" id="shipState" required value="Maharashtra" />
-            </div>
-            <div class="form-group">
-              <label class="input-label">PIN / Postal Code *</label>
-              <input type="text" class="luxury-input" id="shipPin" required value="400026" />
-            </div>
-            <div class="form-group">
-              <label class="input-label">Atelier Delivery Instructions</label>
-              <input type="text" class="luxury-input" placeholder="e.g. Call concierge on arrival" />
-            </div>
-          </div>
-
-          <div style="margin-top: 2rem; display: flex; justify-content: space-between; align-items: center;">
-            <button type="button" class="btn btn-secondary" onclick="App.closeCheckout()">Back to Bag</button>
-            <button type="submit" class="btn btn-primary">
-              Continue to Payment &bull; ${formatINR(total)}
-            </button>
-          </div>
-        </form>
-      `;
-    } else if (this.checkoutStep === 2) {
-      body.innerHTML = `
-        <div>
-          <h3 class="serif-font" style="font-size: 1.6rem; margin-bottom: 0.5rem;">Select Payment Privilege</h3>
-          <p style="font-size: 0.8rem; color: var(--color-noir-muted); margin-bottom: 1.5rem;">
-            Demo Mode Enabled: Real payment processing is simulated securely without actual bank transactions.
-          </p>
-
-          <div class="payment-methods-grid">
-            <div class="payment-method-card active" onclick="App.selectPaymentMethod(this, 'upi')">
-              <input type="radio" name="paymentMethod" checked />
-              <div>
-                <div class="payment-title">Instant UPI & QR</div>
-                <div class="payment-desc">Google Pay, PhonePe, Paytm, BHIM</div>
-              </div>
-            </div>
-
-            <div class="payment-method-card" onclick="App.selectPaymentMethod(this, 'card')">
-              <input type="radio" name="paymentMethod" />
-              <div>
-                <div class="payment-title">Black & Centurion Cards</div>
-                <div class="payment-desc">Visa, Mastercard, Amex Global</div>
-              </div>
-            </div>
-
-            <div class="payment-method-card" onclick="App.selectPaymentMethod(this, 'netbanking')">
-              <input type="radio" name="paymentMethod" />
-              <div>
-                <div class="payment-title">Private NetBanking</div>
-                <div class="payment-desc">HDFC, ICICI, Axis, SBI Wealth</div>
-              </div>
-            </div>
-
-            <div class="payment-method-card" onclick="App.selectPaymentMethod(this, 'cod')">
-              <input type="radio" name="paymentMethod" />
-              <div>
-                <div class="payment-title">White-Glove Pay on Delivery</div>
-                <div class="payment-desc">Cash or POS terminal at your doorstep</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="order-summary-box">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-              <span>Total Items (${luxeStore.getCartCount()}):</span>
-              <strong>${formatINR(luxeStore.getCartSubtotal())}</strong>
-            </div>
-            ${luxeStore.getDiscountAmount() > 0 ? `
-              <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; color: var(--color-success);">
-                <span>Privilege Discount:</span>
-                <strong>-${formatINR(luxeStore.getDiscountAmount())}</strong>
-              </div>
-            ` : ''}
-            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-              <span>White-Glove Delivery:</span>
-              <strong>${luxeStore.getShippingCost() === 0 ? 'COMPLIMENTARY' : formatINR(luxeStore.getShippingCost())}</strong>
-            </div>
-            <div style="display: flex; justify-content: space-between; padding-top: 0.75rem; border-top: 1px solid rgba(197, 168, 128, 0.4); font-size: 1.1rem; font-weight: 600;">
-              <span>Amount Payable:</span>
-              <span>${formatINR(total)}</span>
-            </div>
-          </div>
-
-          <div style="margin-top: 2rem; display: flex; justify-content: space-between; align-items: center;">
-            <button type="button" class="btn btn-secondary" onclick="App.checkoutStep = 1; App.renderCheckoutStep();">Back</button>
-            <button type="button" class="btn btn-primary" id="placeOrderBtn" onclick="App.completeDemoOrder()">
-              Authorize & Place Order
-            </button>
-          </div>
-        </div>
-      `;
-    } else if (this.checkoutStep === 3) {
-      const orderId = `LX-${Math.floor(100000 + Math.random() * 900000)}`;
-      const deliveryDate = new Date();
-      deliveryDate.setDate(deliveryDate.getDate() + 4);
-      const formattedDate = deliveryDate.toLocaleDateString('en-IN', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
-
-      body.innerHTML = `
-        <div class="order-success-view">
-          <div class="order-success-icon">${UI.icons.check}</div>
-          <span class="eyebrow">Thank You For Your Patronage</span>
-          <h2 class="order-success-title serif-font">Order Placed Successfully</h2>
-          <div class="order-id-tag">ORDER REFERENCE: ${orderId}</div>
-
-          <p style="font-size: 0.9rem; color: var(--color-noir-muted); max-width: 500px; margin: 0 auto 2rem;">
-            A confirmation email with your bespoke tracking dossier and authenticity certificate has been dispatched.
-          </p>
-
-          <div class="order-summary-box">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-              <span>Estimated Delivery:</span>
-              <strong>${formattedDate}</strong>
-            </div>
-            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-              <span>Delivery Protocol:</span>
-              <span>White-Glove Insured Courier</span>
-            </div>
-            <div style="display: flex; justify-content: space-between;">
-              <span>Payment Status:</span>
-              <span style="color: var(--color-success); font-weight: 600;">Authorized & Confirmed</span>
-            </div>
-          </div>
-
-          <button class="btn btn-primary" onclick="App.closeCheckout(); App.scrollToCatalog();">
-            Continue Exploring Collections
-          </button>
-        </div>
-      `;
-
-      // Clear the cart on successful checkout
-      luxeStore.clearCart();
-    }
-  },
-
-  proceedToPayment() {
-    this.checkoutStep = 2;
-    this.renderCheckoutStep();
-  },
-
-  selectPaymentMethod(cardElement, method) {
-    document.querySelectorAll('.payment-method-card').forEach(c => c.classList.remove('active'));
-    cardElement.classList.add('active');
-    const radio = cardElement.querySelector('input[type="radio"]');
-    if (radio) radio.checked = true;
-  },
-
-  completeDemoOrder() {
-    const btn = document.getElementById('placeOrderBtn');
-    if (btn) {
-      btn.innerHTML = `<span style="display:inline-block; animation: spin 1s infinite linear;">⟳</span> Authorizing Atelier Order...`;
-      btn.disabled = true;
-    }
-
-    setTimeout(() => {
-      this.checkoutStep = 3;
-      this.renderCheckoutStep();
-      UI.showToast("Order placed successfully! Thank you for choosing Luxe Label.");
-    }, 1200);
-  },
-
-  // --- Utility ---
+  // --- Utility Dismiss ---
   closeAllDrawersAndModals() {
     this.closeCart();
     this.closeWishlist();
-    this.closeQuickView();
+    this.closeProductDetail();
     this.closeSearch();
-    this.closeSizeGuide();
-    this.closeContactModal();
     this.closeCheckout();
+    this.closePolicyModal();
     this.closeMobileNav();
   }
 };
 
-// Initialize when DOM is ready
+// Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
   App.init();
 });

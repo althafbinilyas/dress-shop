@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LUXE LABEL | Haute Couture & Luxury Prêt</title>
-  <meta name="description" content="Discover LUXE LABEL: Exquisite high-fashion couture, artisanal Indian ethnic wear, Italian tailoring, and bespoke silhouettes crafted for the discerning connoisseur." />
+  <title>LUXE LABEL | Haute Couture & Contemporary Luxury</title>
+  <meta name="description" content="Discover LUXE LABEL: Contemporary luxury fashion house offering curated women's and men's designer-inspired clothing, tailoring, and royal ethnic edits." />
 
-  <!-- Google Fonts Preconnect -->
+  <!-- Fonts Preconnect: Cormorant Garamond & Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=Montserrat:wght@200;300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
   <!-- Stylesheets -->
   <link rel="stylesheet" href="css/style.css" />
@@ -22,184 +22,185 @@
        Top Announcement Bar
        ======================================================================== -->
   <aside class="announcement-bar" id="announcementBar">
-    <span>
-      COMPLIMENTARY WHITE-GLOVE DELIVERY ON ORDERS OVER <span class="gold-accent">₹15,000</span> &bull; COMPLIMENTARY SIGNATURE BOX ON CODE <span class="gold-accent">LUXE10</span>
-    </span>
+    FREE SHIPPING ON ORDERS OVER ₹2,999 &bull; COMPLIMENTARY 14-DAY ATELIER RETURNS
   </aside>
 
   <!-- ========================================================================
-       Main Navigation Bar
+       Header & Navigation
        ======================================================================== -->
   <header class="site-header" id="siteHeader">
     <div class="container header-inner">
-      <!-- Mobile Hamburger Button -->
-      <button class="mobile-menu-toggle" id="mobileMenuBtn" aria-label="Open Navigation Menu" onclick="App.openMobileNav()">
-        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      <!-- Mobile Menu Toggle Button -->
+      <button class="mobile-toggle action-btn" id="mobileMenuBtn" aria-label="Open Navigation Menu" onclick="App.openMobileNav()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       </button>
 
-      <!-- Desktop Nav Links -->
-      <nav class="main-nav" aria-label="Main Navigation">
-        <ul class="nav-links">
-          <li><a href="#hero" class="nav-link active">Home</a></li>
-          <li><a href="#catalogSection" class="nav-link" onclick="App.handleCategoryFilter('Women')">Women</a></li>
-          <li><a href="#catalogSection" class="nav-link" onclick="App.handleCategoryFilter('Men')">Men</a></li>
-          <li><a href="#curatedCollections" class="nav-link">Collections</a></li>
-          <li><a href="#catalogSection" class="nav-link" onclick="App.handleCategoryFilter('Ethnic Wear')">Ethnic Wear</a></li>
-          <li><a href="#contactSection" class="nav-link" onclick="App.openContactModal()">Contact</a></li>
-        </ul>
+      <!-- Desktop Navigation Menu -->
+      <nav class="nav-menu" aria-label="Main Navigation">
+        <a href="#hero" class="nav-link active">Home</a>
+        <a href="#catalogSection" class="nav-link" onclick="App.handleDepartmentFilter('Women')">Women</a>
+        <a href="#catalogSection" class="nav-link" onclick="App.handleDepartmentFilter('Men')">Men</a>
+        <a href="#categorySection" class="nav-link">Collections</a>
+        <a href="#newArrivalsSection" class="nav-link">New Arrivals</a>
+        <a href="#catalogSection" class="nav-link nav-link-sale" onclick="App.handleCategoryFilter('all'); document.getElementById('chkSaleOnly').click();">Sale</a>
       </nav>
 
-      <!-- Brand Logo (Center) -->
-      <div class="brand-logo-wrap">
-        <a href="#hero" class="brand-logo">LUXE LABEL</a>
-        <span class="brand-submark">HAUTE COUTURE &bull; ATELIER</span>
+      <!-- Center Brand Wordmark -->
+      <div class="header-logo-wrap">
+        <a href="#hero" class="header-logo">LUXE LABEL</a>
+        <span class="header-logo-sub">CONTEMPORARY HAUTE ATELIER</span>
       </div>
 
-      <!-- Header Actions (Right) -->
+      <!-- Action Icons (Search, Wishlist, Shopping Bag) -->
       <div class="header-actions">
-        <!-- Currency Pill -->
-        <span class="currency-badge" title="Currency Set to Indian Rupee">₹ INR</span>
-
-        <!-- Search Icon Button -->
-        <button class="action-btn" id="headerSearchBtn" title="Search Creations (Press /)" onclick="App.openSearch()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <!-- Search Button (Press / to search) -->
+        <button class="action-btn" id="headerSearchBtn" title="Search Creations (Press /)" aria-label="Search Collection" onclick="App.openSearch()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
         </button>
 
-        <!-- Wishlist Icon Button -->
-        <button class="action-btn" id="headerWishlistBtn" title="Wishlist" onclick="App.openWishlist()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
-          <span class="badge-counter" id="wishlistHeaderBadge">0</span>
+        <!-- Wishlist Button -->
+        <button class="action-btn" id="headerWishlistBtn" title="Saved Wishlist" aria-label="View Saved Wishlist" onclick="App.openWishlist()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+          <span class="count-pill" id="wishlistBadgeCount">0</span>
         </button>
 
-        <!-- Shopping Bag Icon Button -->
-        <button class="action-btn" id="headerCartBtn" title="Shopping Bag" onclick="App.openCart()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-          <span class="badge-counter" id="cartHeaderBadge">0</span>
+        <!-- Shopping Bag Button -->
+        <button class="action-btn" id="headerCartBtn" title="Shopping Bag" aria-label="View Shopping Bag" onclick="App.openCart()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          <span class="count-pill" id="cartBadgeCount">0</span>
         </button>
       </div>
     </div>
   </header>
 
   <!-- ========================================================================
-       Hero Section
+       1. Editorial Hero Campaign (Asymmetric Two-Column Layout)
        ======================================================================== -->
-  <section class="hero-section" id="hero">
-    <div class="hero-background">
-      <img 
-        class="hero-bg-img" 
-        src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=2000&q=90" 
-        alt="Luxe Label High Fashion Editorial" 
-      />
-      <div class="hero-overlay"></div>
-    </div>
-
-    <div class="hero-content">
-      <span class="hero-tag">The Autumn-Winter Atelier 2026</span>
-      <h1 class="hero-title">ELEVATE YOUR STYLE</h1>
-      <p class="hero-subtitle">Discover fashion that defines you. Timeless silhouettes crafted with rare textiles and impeccable artisanal mastery.</p>
-      
-      <div class="hero-cta-group">
-        <a href="#catalogSection" class="btn btn-primary" onclick="App.scrollToCatalog()">Explore Collection</a>
-        <a href="#curatedCollections" class="btn btn-secondary">Discover Lookbook</a>
+  <section class="hero-campaign" id="hero">
+    <div class="hero-grid">
+      <!-- Left Column: Editorial Typography & Actions -->
+      <div class="hero-text-col">
+        <span class="hero-eyebrow">THE AUTUMN / WINTER EDIT</span>
+        <h1 class="hero-headline">
+          <span>THE ART OF</span>
+          <span>GETTING DRESSED.</span>
+        </h1>
+        <p class="hero-subtext">Discover pieces that make every moment a statement. Timeless silhouettes crafted with rare textiles and architectural tailoring.</p>
+        <div class="hero-actions">
+          <a href="#catalogSection" class="btn btn-primary" onclick="App.scrollToCatalog()">EXPLORE COLLECTION</a>
+          <a href="#editorialStory" class="btn btn-underline">DISCOVER THE EDIT &rarr;</a>
+        </div>
       </div>
-    </div>
 
-    <div class="hero-scroll-indicator" onclick="App.scrollToCatalog()">
-      <span>Explore</span>
-      <div class="scroll-line"></div>
-    </div>
-  </section>
-
-  <!-- ========================================================================
-       Trust & Brand Pillars
-       ======================================================================== -->
-  <section class="trust-bar" aria-label="Brand Pillars">
-    <div class="container">
-      <div class="trust-grid">
-        <div class="trust-item">
-          <div class="trust-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-          </div>
-          <div>
-            <h4 class="trust-title">White-Glove Delivery</h4>
-            <p class="trust-desc">Complimentary insured transit across India on orders over ₹15,000.</p>
-          </div>
-        </div>
-
-        <div class="trust-item">
-          <div class="trust-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
-          </div>
-          <div>
-            <h4 class="trust-title">Artisanal Mastery</h4>
-            <p class="trust-desc">Handcrafted Banarasi raw silk, Giza cotton, and Mongolian cashmere.</p>
-          </div>
-        </div>
-
-        <div class="trust-item">
-          <div class="trust-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 7h-7m7 5h-7m7 5h-7M4 7h.01M4 12h.01M4 17h.01"/></svg>
-          </div>
-          <div>
-            <h4 class="trust-title">Bespoke Tailoring</h4>
-            <p class="trust-desc">Complimentary private alterations by our master atelier tailors.</p>
-          </div>
-        </div>
-
-        <div class="trust-item">
-          <div class="trust-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-          </div>
-          <div>
-            <h4 class="trust-title">Complimentary Returns</h4>
-            <p class="trust-desc">Seamless 14-day luxury door pickup and exchange service.</p>
-          </div>
+      <!-- Right Column: Dominant Editorial Photography -->
+      <div class="hero-image-col">
+        <img class="hero-image" src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=1600&q=88" alt="Luxe Label Autumn Winter Editorial" />
+        <div class="hero-image-badge">
+          <span>Look 01 &bull; Virgin Wool & Silk</span>
         </div>
       </div>
     </div>
   </section>
 
   <!-- ========================================================================
-       Curated Categories
+       2. Section: New Arrivals (4 to 8 products)
        ======================================================================== -->
-  <section class="categories-section" id="curatedCollections">
+  <section class="section-new-arrivals" id="newArrivalsSection">
     <div class="container">
       <div class="text-center">
-        <span class="eyebrow">Curated Universes</span>
-        <h2 class="section-title">THE ATELIER COLLECTIONS</h2>
-        <p class="section-subtitle center-block">Explore our signature edits tailored to perfection, from red carpet couture to royal ceremonial ensembles.</p>
+        <span class="eyebrow-label">Seasonal Debuts</span>
+        <h2 class="section-headline">NEW ARRIVALS</h2>
+        <p class="section-subtext center-block">A first look at our newest seasonal arrivals, sculpted for modern eveningwear and tailored ease.</p>
       </div>
 
-      <div class="categories-grid">
-        <div class="category-card" onclick="App.handleCategoryFilter('Dresses'); App.scrollToCatalog();">
-          <img class="category-img" src="https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=800&q=80" alt="Women Haute Couture" />
-          <div class="category-card-overlay">
-            <h3 class="category-card-title">Women's Couture</h3>
-            <span class="category-card-link">Explore Edit &rarr;</span>
+      <div class="products-grid" id="newArrivalsGrid">
+        <!-- Rendered by UI.renderNewArrivals() -->
+      </div>
+
+      <div class="text-center" style="margin-top: 3.5rem;">
+        <button class="btn btn-secondary" onclick="App.scrollToCatalog()">View All New Additions</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       3. Section: Monochrome Campaign Banner (LESS, BUT BETTER.)
+       ======================================================================== -->
+  <section class="monochrome-banner" id="monochromeBanner">
+    <div class="monochrome-banner-bg">
+      <img src="https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=1600&q=85" alt="Monochrome Editorial" />
+    </div>
+    <div class="container monochrome-banner-content">
+      <span class="eyebrow-label" style="color: var(--color-accent);">THE PURITY OF FORM</span>
+      <h2 class="monochrome-banner-title">LESS, BUT BETTER.</h2>
+      <p class="monochrome-banner-sub">
+        Uncluttered lines, noble materials, and precise proportions. We strip away the unnecessary so that true craftsmanship and impeccable silhouettes remain.
+      </p>
+      <button class="btn btn-primary" style="background-color: #FFFFFF; color: #171717; border-color: #FFFFFF;" onclick="App.handleCategoryFilter('Tailoring'); App.scrollToCatalog();">
+        Explore Tailoring Edit
+      </button>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       4. Section: Shop by Category (Women, Men, Tailoring, Dresses, Ethnic Edit)
+       ======================================================================== -->
+  <section class="section-categories" id="categorySection">
+    <div class="container">
+      <div class="text-center">
+        <span class="eyebrow-label">Curated Universes</span>
+        <h2 class="section-headline">SHOP BY CATEGORY</h2>
+        <p class="section-subtext center-block">Explore our signature departments designed to anchor your wardrobe with distinction.</p>
+      </div>
+
+      <div class="category-mosaic">
+        <!-- 1. Women -->
+        <div class="category-tile" onclick="App.handleDepartmentFilter('Women'); App.scrollToCatalog();" style="cursor: pointer;">
+          <img class="category-tile-img" src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80" alt="Women Category" />
+          <div class="category-tile-overlay"></div>
+          <div class="category-tile-info">
+            <h3 class="category-tile-name">Women</h3>
+            <span class="category-tile-link">Discover Edit &rarr;</span>
           </div>
         </div>
 
-        <div class="category-card" onclick="App.handleCategoryFilter('Ethnic Wear'); App.scrollToCatalog();">
-          <img class="category-img" src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=800&q=80" alt="Royal Ethnic Wear" />
-          <div class="category-card-overlay">
-            <h3 class="category-card-title">Royal Ethnic</h3>
-            <span class="category-card-link">Explore Edit &rarr;</span>
+        <!-- 2. Men -->
+        <div class="category-tile" onclick="App.handleDepartmentFilter('Men'); App.scrollToCatalog();" style="cursor: pointer;">
+          <img class="category-tile-img" src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80" alt="Men Category" />
+          <div class="category-tile-overlay"></div>
+          <div class="category-tile-info">
+            <h3 class="category-tile-name">Men</h3>
+            <span class="category-tile-link">Discover Edit &rarr;</span>
           </div>
         </div>
 
-        <div class="category-card" onclick="App.handleCategoryFilter('Jackets'); App.scrollToCatalog();">
-          <img class="category-img" src="https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&w=800&q=80" alt="Men's Sartorial" />
-          <div class="category-card-overlay">
-            <h3 class="category-card-title">Men's Sartorial</h3>
-            <span class="category-card-link">Explore Edit &rarr;</span>
+        <!-- 3. Tailoring -->
+        <div class="category-tile" onclick="App.handleCategoryFilter('Tailoring'); App.scrollToCatalog();" style="cursor: pointer;">
+          <img class="category-tile-img" src="https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&w=800&q=80" alt="Tailoring Category" />
+          <div class="category-tile-overlay"></div>
+          <div class="category-tile-info">
+            <h3 class="category-tile-name">Tailoring</h3>
+            <span class="category-tile-link">Discover Edit &rarr;</span>
           </div>
         </div>
 
-        <div class="category-card" onclick="App.handleCategoryFilter('Jackets'); App.scrollToCatalog();">
-          <img class="category-img" src="https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=800&q=80" alt="Outerwear & Cashmere" />
-          <div class="category-card-overlay">
-            <h3 class="category-card-title">Fine Outerwear</h3>
-            <span class="category-card-link">Explore Edit &rarr;</span>
+        <!-- 4. Dresses -->
+        <div class="category-tile" onclick="App.handleCategoryFilter('Dresses'); App.scrollToCatalog();" style="cursor: pointer;">
+          <img class="category-tile-img" src="https://images.unsplash.com/photo-1564257631407-4deb1f99d992?auto=format&fit=crop&w=800&q=80" alt="Dresses Category" />
+          <div class="category-tile-overlay"></div>
+          <div class="category-tile-info">
+            <h3 class="category-tile-name">Dresses</h3>
+            <span class="category-tile-link">Discover Edit &rarr;</span>
+          </div>
+        </div>
+
+        <!-- 5. Ethnic Edit -->
+        <div class="category-tile" onclick="App.handleCategoryFilter('Ethnic Edit'); App.scrollToCatalog();" style="cursor: pointer;">
+          <img class="category-tile-img" src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=800&q=80" alt="Ethnic Edit Category" />
+          <div class="category-tile-overlay"></div>
+          <div class="category-tile-info">
+            <h3 class="category-tile-name">Ethnic Edit</h3>
+            <span class="category-tile-link">Discover Edit &rarr;</span>
           </div>
         </div>
       </div>
@@ -207,231 +208,275 @@
   </section>
 
   <!-- ========================================================================
-       Product Catalog & Dynamic Filter Section
+       5. Section: Trending Now Product Grid
        ======================================================================== -->
-  <section class="catalog-section" id="catalogSection">
+  <section class="section-trending" id="trendingSection">
     <div class="container">
-      <div class="catalog-header text-center">
-        <span class="eyebrow">The Masterpiece Selection</span>
-        <h2 class="section-title">DISCOVER THE COLLECTION</h2>
-        <p class="section-subtitle center-block">Each creation represents hundreds of artisan hours, woven with unmatched heritage techniques and contemporary silhouettes.</p>
+      <div class="text-center">
+        <span class="eyebrow-label">In High Demand</span>
+        <h2 class="section-headline">TRENDING NOW</h2>
+        <p class="section-subtext center-block">The silhouettes capturing the admiration of patrons and fashion editors worldwide.</p>
       </div>
 
-      <!-- Filter & Sort Control Bar -->
-      <div class="catalog-controls">
-        <!-- Category Filter Pills -->
-        <div class="filter-pills" id="categoryFilterPills">
-          <button class="filter-pill active" onclick="App.handleCategoryFilter('all', this)">All Creations</button>
-          <button class="filter-pill" onclick="App.handleCategoryFilter('Women', this)">Women</button>
-          <button class="filter-pill" onclick="App.handleCategoryFilter('Men', this)">Men</button>
-          <button class="filter-pill" onclick="App.handleCategoryFilter('Ethnic Wear', this)">Ethnic Wear</button>
-          <button class="filter-pill" onclick="App.handleCategoryFilter('Dresses', this)">Dresses & Gowns</button>
-          <button class="filter-pill" onclick="App.handleCategoryFilter('Jackets', this)">Jackets & Tuxedos</button>
-          <button class="filter-pill" onclick="App.handleCategoryFilter('Shirts', this)">Shirts</button>
-          <button class="filter-pill" onclick="App.handleCategoryFilter('Trousers', this)">Trousers</button>
+      <div class="products-grid" id="trendingGrid">
+        <!-- Rendered by UI.renderTrending() -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       6. Section: Curated Designer-Inspired Editorial Feature
+       ======================================================================== -->
+  <section class="editorial-feature-section" id="editorialStory">
+    <div class="container">
+      <div class="editorial-split">
+        <div class="editorial-image-wrap">
+          <img src="https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=1200&q=85" alt="Designer Editorial" />
+        </div>
+        <div class="editorial-story">
+          <span class="eyebrow-label">Atelier Conversation</span>
+          <h2 class="section-headline">ARCHITECTURAL ELEGANCE</h2>
+          <blockquote class="editorial-quote">
+            "A garment should feel like architecture in motion — holding its dignity, yet breathing with the woman who wears it."
+          </blockquote>
+          <p class="editorial-text">
+            Our creative studio draws inspiration from classic mid-century European tailoring blended with the rich tapestry of Indian artisanal heritage. Whether sculpting a floating half-canvas tuxedo or hand-embellishing Banarasi raw silk with zardozi, every seam represents hundreds of dedicated hours.
+          </p>
+          <div style="display: flex; gap: 1.5rem; align-items: center;">
+            <button class="btn btn-primary" onclick="App.openPolicyModal('contact')">Schedule Atelier Fitting</button>
+            <span style="font-family: var(--font-serif); font-size: 1.3rem; font-style: italic; color: var(--color-accent);">LUXE LABEL Creative Studio</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       7. Section: Best Sellers
+       ======================================================================== -->
+  <section class="section-bestsellers" id="bestSellersSection">
+    <div class="container">
+      <div class="text-center">
+        <span class="eyebrow-label">Patron Favorites</span>
+        <h2 class="section-headline">BEST SELLERS</h2>
+        <p class="section-subtext center-block">Enduring icons that define the essence of LUXE LABEL craftsmanship.</p>
+      </div>
+
+      <div class="products-grid" id="bestSellersGrid">
+        <!-- Rendered by UI.renderBestSellers() -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       Master Interactive Product Catalog & Dynamic Filters
+       ======================================================================== -->
+  <section class="section-new-arrivals" id="catalogSection" style="background-color: var(--color-bg); padding: 5rem 0;">
+    <div class="container">
+      <div class="text-center">
+        <span class="eyebrow-label">The Complete Collection</span>
+        <h2 class="section-headline">THE COMPLETE ATELIER</h2>
+        <p class="section-subtext center-block">Explore our full 16-piece collection across tailoring, dresses, shirts, and royal ethnic edits.</p>
+      </div>
+
+      <!-- Main Filter Bar -->
+      <div class="catalog-bar">
+        <div class="filter-group-tabs">
+          <button class="filter-tab active" onclick="App.handleCategoryFilter('all', this)">All Creations</button>
+          <button class="filter-tab" onclick="App.handleCategoryFilter('Tailoring', this)">Tailoring</button>
+          <button class="filter-tab" onclick="App.handleCategoryFilter('Dresses', this)">Dresses</button>
+          <button class="filter-tab" onclick="App.handleCategoryFilter('Shirts', this)">Shirts</button>
+          <button class="filter-tab" onclick="App.handleCategoryFilter('Trousers', this)">Trousers</button>
+          <button class="filter-tab" onclick="App.handleCategoryFilter('Ethnic Edit', this)">Ethnic Edit</button>
         </div>
 
-        <!-- Catalog Tools (Search & Sort) -->
-        <div class="catalog-tools">
-          <div class="catalog-search-wrap">
-            <input type="text" id="catalogSearchInput" class="catalog-search-input" placeholder="Search creations..." />
+        <div class="catalog-search-sort-group">
+          <!-- Search Input -->
+          <div class="catalog-input-wrap">
+            <input type="text" id="catalogSearchInput" class="catalog-search-field" placeholder="Search creations..." />
             <span class="catalog-search-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
             </span>
           </div>
 
-          <div class="sort-select-wrap">
-            <select id="catalogSortSelect" class="sort-select" aria-label="Sort products">
+          <!-- Sort Select -->
+          <div class="catalog-select-wrap">
+            <select id="catalogSortSelect" class="catalog-select-field" aria-label="Sort products">
               <option value="featured">Sort: Featured</option>
+              <option value="newest">Newest First</option>
               <option value="price-low">Price: Low to High</option>
               <option value="price-high">Price: High to Low</option>
-              <option value="newest">New Arrivals First</option>
-              <option value="rating">Highest Rated</option>
             </select>
-            <span class="sort-arrow">&darr;</span>
           </div>
 
-          <span class="catalog-count" id="catalogCount">Showing 16 Creations</span>
+          <span class="catalog-counter-text" id="catalogResultCount">Showing 16 Creations</span>
         </div>
       </div>
 
-      <!-- Products Grid -->
+      <!-- Secondary Filter Strip (Department, Sizes, Clear) -->
+      <div class="secondary-filters-bar">
+        <div style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
+          <!-- Department pills -->
+          <div style="display: flex; gap: 0.35rem;">
+            <button class="dept-tab filter-tab active" onclick="App.handleDepartmentFilter('all', this)">All Depts</button>
+            <button class="dept-tab filter-tab" onclick="App.handleDepartmentFilter('Women', this)">Women</button>
+            <button class="dept-tab filter-tab" onclick="App.handleDepartmentFilter('Men', this)">Men</button>
+          </div>
+
+          <!-- Size chips -->
+          <div class="size-filter-chips">
+            <span style="font-size: 0.68rem; color: var(--color-text-muted); text-transform: uppercase;">Size:</span>
+            <button class="size-chip active" onclick="App.handleSizeFilter('all', this)">All</button>
+            <button class="size-chip" onclick="App.handleSizeFilter('XS', this)">XS</button>
+            <button class="size-chip" onclick="App.handleSizeFilter('S', this)">S</button>
+            <button class="size-chip" onclick="App.handleSizeFilter('M', this)">M</button>
+            <button class="size-chip" onclick="App.handleSizeFilter('L', this)">L</button>
+            <button class="size-chip" onclick="App.handleSizeFilter('XL', this)">XL</button>
+          </div>
+
+          <!-- Sale toggle checkbox -->
+          <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.75rem; cursor: pointer;">
+            <input type="checkbox" id="chkSaleOnly" onchange="App.handleSaleFilterToggle(this)" />
+            <span>Sale Only</span>
+          </label>
+        </div>
+
+        <button class="clear-filters-btn" onclick="App.resetAllFilters()">Clear All Filters</button>
+      </div>
+
+      <!-- Master Products Grid -->
       <div class="products-grid" id="catalogGrid">
-        <!-- Rendered dynamically by UI.renderCatalog() -->
+        <!-- Injected dynamically by UI.renderCatalog() -->
       </div>
     </div>
   </section>
 
   <!-- ========================================================================
-       Editorial Spotlight Section
+       8. Section: Brand Philosophy (STYLE IS PERSONAL.)
        ======================================================================== -->
-  <section class="editorial-section">
+  <section class="philosophy-section" id="philosophySection">
     <div class="container">
-      <div class="editorial-grid">
-        <div class="editorial-image-frame">
-          <img class="editorial-img" src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=1200&q=85" alt="Atelier Craftsmanship" />
-          <div class="editorial-badge">
-            <div class="editorial-badge-title">The Banarasi Heritage Project</div>
-            <div class="editorial-badge-sub">240+ Artisan Hours Per Ensemble</div>
-          </div>
+      <span class="eyebrow-label">Brand Creed</span>
+      <h2 class="philosophy-title">STYLE IS PERSONAL.</h2>
+      <p class="philosophy-body">
+        Trends are fleeting; personal resonance is eternal. We create limited capsule collections designed to be cherished, tailored, and passed down through generations.
+      </p>
+
+      <div class="philosophy-values">
+        <div class="philosophy-value-item">
+          <h4 class="philosophy-value-title">Rare Materials</h4>
+          <p class="philosophy-value-desc">Certified Grade-6A Mulberry silk, Mongolian cashmere, and long-staple Egyptian cotton yarns.</p>
         </div>
-
-        <div class="editorial-content">
-          <span class="eyebrow">Our Philosophy</span>
-          <h2 class="section-title">THE ART OF IMMORTAL SILHOUETTES</h2>
-          <blockquote class="editorial-quote">
-            "True luxury does not clamor for attention. It speaks in the quiet rustle of pure mulberry silk and the sublime weight of Italian cashmere."
-          </blockquote>
-          <p class="editorial-body">
-            Founded on the pillars of timeless elegance, LUXE LABEL bridges the storied corridors of Indian royal craftsmanship with modern European architectural tailoring. From hand-carved mother-of-pearl buttons to 22-stitches-per-inch seamlines, each piece is a celebration of uncompromising devotion to form and finish.
-          </p>
-          <div style="display: flex; gap: 1.5rem; align-items: center;">
-            <button class="btn btn-primary" onclick="App.openContactModal()">Book Atelier Appointment</button>
-            <div class="editorial-signature">Aurelius & Co. &bull; Haute Atelier</div>
-          </div>
+        <div class="philosophy-value-item">
+          <h4 class="philosophy-value-title">Zero Waste Atelier</h4>
+          <p class="philosophy-value-desc">Small batch cutting and heritage handloom weaving preventing industrial overproduction.</p>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ========================================================================
-       Press & Connoisseur Testimonials
-       ======================================================================== -->
-  <section class="press-section">
-    <div class="container">
-      <span class="eyebrow">Critical Acclaim</span>
-      <h2 class="section-title">THE CONNOISSEUR'S VERDICT</h2>
-      <p class="section-subtitle center-block">Celebrated across international fashion capitals and prestigious editorial pages.</p>
-
-      <div class="press-quotes-grid">
-        <div class="press-item">
-          <div class="press-logo">VOGUE INDIA</div>
-          <p class="press-text">"LUXE LABEL redefines modern Indian haute couture with sculptural silhouettes and breathtaking zardozi embroidery."</p>
-          <div class="press-stars">★★★★★</div>
-        </div>
-
-        <div class="press-item">
-          <div class="press-logo">GQ MAGAZINE</div>
-          <p class="press-text">"Uncompromising precision. The Super 150s midnight navy tuxedo represents the highest tier of bespoke menswear craftsmanship."</p>
-          <div class="press-stars">★★★★★</div>
-        </div>
-
-        <div class="press-item">
-          <div class="press-logo">HARPER'S BAZAAR</div>
-          <p class="press-text">"An exquisite dialogue between timeless heritage and contemporary audacity. The bias-cut silk gowns are pure poetry in motion."</p>
-          <div class="press-stars">★★★★★</div>
+        <div class="philosophy-value-item">
+          <h4 class="philosophy-value-title">White-Glove Care</h4>
+          <p class="philosophy-value-desc">Complimentary fittings, insured express delivery, and lifetime alteration support.</p>
         </div>
       </div>
     </div>
   </section>
 
   <!-- ========================================================================
-       Newsletter Gazette
+       9. Section: Newsletter Signup (A MORE PERSONAL KIND OF LUXURY.)
        ======================================================================== -->
-  <section class="newsletter-section" id="newsletter">
+  <section class="newsletter-section" id="newsletterSection">
     <div class="container">
-      <div class="newsletter-content">
-        <span class="eyebrow" style="color: var(--color-gold);">Private Gazette</span>
-        <h2 class="newsletter-title serif-font">JOIN THE INNER CIRCLE</h2>
-        <p class="newsletter-subtitle">
-          Receive private runway invitations, advance access to limited-edition capsule drops, and private atelier appointments.
-        </p>
+      <span class="eyebrow-label" style="color: var(--color-accent);">THE PRIVATE GAZETTE</span>
+      <h2 class="newsletter-title">A MORE PERSONAL KIND OF LUXURY.</h2>
+      <p class="newsletter-subtitle">
+        Join our inner circle for advance access to limited-edition runway drops, private stylist appointments, and seasonal invitations.
+      </p>
 
-        <form class="newsletter-form" id="newsletterForm">
-          <input type="email" id="newsletterEmail" class="newsletter-input" placeholder="Enter your email address..." required />
-          <button type="submit" class="newsletter-btn">Subscribe &rarr;</button>
-        </form>
-        <p class="newsletter-privacy">By subscribing, you agree to our Privacy Policy. Discretion guaranteed.</p>
-      </div>
+      <form class="newsletter-box" id="newsletterForm">
+        <input type="email" id="newsletterEmail" class="newsletter-input" placeholder="ENTER YOUR EMAIL ADDRESS" required />
+        <button type="submit" class="newsletter-submit">SUBSCRIBE &rarr;</button>
+      </form>
+      <p style="font-size: 0.68rem; color: rgba(255, 255, 255, 0.4); margin-top: 1rem;">
+        Your email is safeguarded with strict discretion. Frontend demo storage.
+      </p>
     </div>
   </section>
 
   <!-- ========================================================================
-       Footer
+       10. Comprehensive Footer
        ======================================================================== -->
-  <footer class="site-footer" id="contactSection">
+  <footer class="site-footer" id="siteFooter">
     <div class="container">
-      <div class="footer-top">
-        <!-- Brand Info -->
-        <div class="footer-brand">
-          <a href="#hero" class="brand-logo">LUXE LABEL</a>
-          <span class="brand-submark">HAUTE COUTURE &bull; ATELIER</span>
-          <p class="footer-desc">
-            Pinnacle luxury fashion house dedicated to architectural silhouettes, artisanal heritage textiles, and timeless elegance.
-          </p>
-          <div class="social-links">
-            <a href="https://instagram.com" target="_blank" rel="noopener" class="social-icon-btn" title="Instagram">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-            </a>
-            <a href="https://facebook.com" target="_blank" rel="noopener" class="social-icon-btn" title="Facebook">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-            </a>
-            <a href="https://pinterest.com" target="_blank" rel="noopener" class="social-icon-btn" title="Pinterest">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            </a>
-          </div>
-        </div>
-
-        <!-- Collections Column -->
+      <div class="footer-columns">
+        <!-- Brand Narrative -->
         <div>
-          <h4 class="footer-col-title">Collections</h4>
-          <ul class="footer-menu">
-            <li><a href="#catalogSection" class="footer-link" onclick="App.handleCategoryFilter('Dresses')">Women's Couture</a></li>
-            <li><a href="#catalogSection" class="footer-link" onclick="App.handleCategoryFilter('Jackets')">Men's Sartorial</a></li>
-            <li><a href="#catalogSection" class="footer-link" onclick="App.handleCategoryFilter('Ethnic Wear')">Royal Ethnic Wear</a></li>
-            <li><a href="#catalogSection" class="footer-link" onclick="App.handleCategoryFilter('Jackets')">Cashmere & Outerwear</a></li>
-            <li><a href="#catalogSection" class="footer-link" onclick="App.handleCategoryFilter('all')">Runway Archive</a></li>
+          <a href="#hero" class="header-logo" style="font-size: 1.8rem;">LUXE LABEL</a>
+          <span class="header-logo-sub" style="margin-bottom: 1rem;">CONTEMPORARY HAUTE ATELIER</span>
+          <p style="font-size: 0.85rem; color: var(--color-text-muted); line-height: 1.7; max-width: 280px; margin-bottom: 1.25rem;">
+            A contemporary luxury fashion house celebrating architectural tailoring, refined silhouettes, and bespoke artisanal craftsmanship.
+          </p>
+          <div class="social-strip">
+            <a href="https://instagram.com" target="_blank" rel="noopener" class="social-btn" title="Instagram">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+            </a>
+            <a href="https://pinterest.com" target="_blank" rel="noopener" class="social-btn" title="Pinterest">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Collections -->
+        <div>
+          <h4 class="footer-col-header">Collections</h4>
+          <ul class="footer-list">
+            <li><a href="#catalogSection" class="footer-link" onclick="App.handleCategoryFilter('Dresses')">Women's Dresses</a></li>
+            <li><a href="#catalogSection" class="footer-link" onclick="App.handleCategoryFilter('Tailoring')">Men's Sartorial</a></li>
+            <li><a href="#catalogSection" class="footer-link" onclick="App.handleCategoryFilter('Ethnic Edit')">Royal Ethnic Edit</a></li>
+            <li><a href="#catalogSection" class="footer-link" onclick="App.handleCategoryFilter('Tailoring')">Cashmere Trench</a></li>
+            <li><a href="#newArrivalsSection" class="footer-link">New Arrivals</a></li>
           </ul>
         </div>
 
-        <!-- Client Care -->
+        <!-- Customer Care -->
         <div>
-          <h4 class="footer-col-title">Client Care</h4>
-          <ul class="footer-menu">
-            <li><a href="javascript:void(0)" class="footer-link" onclick="App.openSizeGuide()">Size & Fit Guide</a></li>
-            <li><a href="javascript:void(0)" class="footer-link" onclick="App.openContactModal()">Private Stylist Consultation</a></li>
-            <li><a href="javascript:void(0)" class="footer-link" onclick="App.openContactModal()">Bespoke Alterations</a></li>
-            <li><a href="javascript:void(0)" class="footer-link" onclick="UI.showToast('Complimentary White-Glove Shipping within 3-5 business days across India.')">Shipping & Delivery</a></li>
-            <li><a href="javascript:void(0)" class="footer-link" onclick="UI.showToast('14-Day Complimentary door pickup and exchange service.')">Returns & Exchanges</a></li>
+          <h4 class="footer-col-header">Customer Care</h4>
+          <ul class="footer-list">
+            <li><a href="javascript:void(0)" class="footer-link" onclick="App.openPolicyModal('size-guide')">Size & Fit Guide</a></li>
+            <li><a href="javascript:void(0)" class="footer-link" onclick="App.openPolicyModal('shipping')">Shipping & Delivery</a></li>
+            <li><a href="javascript:void(0)" class="footer-link" onclick="App.openPolicyModal('returns')">Returns & Exchanges</a></li>
+            <li><a href="javascript:void(0)" class="footer-link" onclick="App.openPolicyModal('faq')">Frequently Asked Questions</a></li>
+            <li><a href="javascript:void(0)" class="footer-link" onclick="App.openPolicyModal('contact')">Private Stylist Booking</a></li>
           </ul>
         </div>
 
-        <!-- The House -->
+        <!-- About LUXE LABEL -->
         <div>
-          <h4 class="footer-col-title">The House</h4>
-          <ul class="footer-menu">
-            <li><a href="#curatedCollections" class="footer-link">Atelier Heritage</a></li>
-            <li><a href="#newsletter" class="footer-link">Sustainability & Ethics</a></li>
-            <li><a href="javascript:void(0)" class="footer-link" onclick="App.openContactModal()">Press Inquiries</a></li>
-            <li><a href="javascript:void(0)" class="footer-link" onclick="App.openContactModal()">Careers at Luxe Label</a></li>
-            <li><a href="javascript:void(0)" class="footer-link" onclick="UI.showToast('Flagship salons located at Mumbai (Altamount Rd) and New Delhi (Chanakyapuri).')">Flagship Boutiques</a></li>
+          <h4 class="footer-col-header">About The House</h4>
+          <ul class="footer-list">
+            <li><a href="#editorialStory" class="footer-link">The Atelier Story</a></li>
+            <li><a href="#philosophySection" class="footer-link">Ethical Sourcing</a></li>
+            <li><a href="javascript:void(0)" class="footer-link" onclick="App.openPolicyModal('contact')">Salons & Locations</a></li>
+            <li><a href="javascript:void(0)" class="footer-link" onclick="App.openPolicyModal('privacy')">Privacy Discretion</a></li>
+            <li><a href="javascript:void(0)" class="footer-link" onclick="App.openPolicyModal('terms')">Terms & Conditions</a></li>
           </ul>
         </div>
 
         <!-- Contact & Atelier -->
         <div>
-          <h4 class="footer-col-title">Private Salons</h4>
-          <div class="footer-contact-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            <span>The Imperial Salon, Altamount Road, Mumbai 400026</span>
-          </div>
-          <div class="footer-contact-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            <span>+91 (022) 8800-LUXE</span>
-          </div>
-          <div class="footer-contact-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-            <span>concierge@luxelabel.com</span>
-          </div>
+          <h4 class="footer-col-header">Private Salons</h4>
+          <ul class="footer-list">
+            <li style="color: var(--color-text-muted);">The Mumbai Salon &bull; Altamount Road</li>
+            <li style="color: var(--color-text-muted);">The Delhi Salon &bull; Chanakyapuri</li>
+            <li style="color: var(--color-text); font-weight: 500;">+91 (022) 8800-LUXE</li>
+            <li><a href="mailto:concierge@luxelabel.com" class="footer-link">concierge@luxelabel.com</a></li>
+          </ul>
         </div>
       </div>
 
-      <div class="footer-bottom">
+      <div class="footer-bottom-row">
         <div>&copy; 2026 LUXE LABEL Haute Couture Pvt. Ltd. All rights reserved.</div>
-        <div class="footer-bottom-links">
-          <a href="javascript:void(0)" onclick="UI.showToast('Privacy Policy: All customer information is encrypted and never shared.')">Privacy Policy</a>
-          <a href="javascript:void(0)" onclick="UI.showToast('Terms of Service: Luxury Pret & Bespoke Alterations protocol.')">Terms of Service</a>
-          <a href="javascript:void(0)" onclick="UI.showToast('Certificate of Authenticity issued with every purchase.')">Authenticity Guarantee</a>
+        <div class="footer-legal-links">
+          <a href="javascript:void(0)" onclick="App.openPolicyModal('privacy')">Privacy Policy</a>
+          <a href="javascript:void(0)" onclick="App.openPolicyModal('terms')">Terms of Service</a>
+          <a href="javascript:void(0)" onclick="App.openPolicyModal('shipping')">White-Glove Shipping</a>
         </div>
       </div>
     </div>
@@ -441,23 +486,26 @@
        Shopping Bag Slide-Over Drawer
        ======================================================================== -->
   <div class="drawer-backdrop" id="cartBackdrop" onclick="App.closeCart()"></div>
-  <aside class="slide-drawer" id="cartDrawer" aria-label="Shopping Bag">
-    <div class="drawer-header">
-      <h3 class="drawer-title">Shopping Bag <span id="cartDrawerCount">(0)</span></h3>
+  <aside class="side-drawer" id="cartDrawer" aria-label="Shopping Bag Drawer">
+    <div class="drawer-top">
+      <h3 class="drawer-heading">Shopping Bag <span id="cartDrawerCount">(0)</span></h3>
       <button class="drawer-close-btn" onclick="App.closeCart()" aria-label="Close Shopping Bag">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
 
-    <div class="shipping-meter-wrap" id="shippingMeterWrap">
+    <!-- Free Shipping Progress Threshold (₹2,999) -->
+    <div class="shipping-progress-panel" id="shippingProgressPanel">
       <!-- Injected by UI.renderCartDrawer() -->
     </div>
 
-    <div class="drawer-body" id="cartDrawerBody">
+    <!-- Line items list -->
+    <div class="drawer-content-area" id="cartDrawerBody">
       <!-- Injected by UI.renderCartDrawer() -->
     </div>
 
-    <div class="drawer-footer" id="cartDrawerFooter">
+    <!-- Summary & Checkout Footer -->
+    <div class="drawer-bottom" id="cartDrawerBottom">
       <!-- Injected by UI.renderCartDrawer() -->
     </div>
   </aside>
@@ -466,214 +514,107 @@
        Wishlist Slide-Over Drawer
        ======================================================================== -->
   <div class="drawer-backdrop" id="wishlistBackdrop" onclick="App.closeWishlist()"></div>
-  <aside class="slide-drawer" id="wishlistDrawer" aria-label="Wishlist">
-    <div class="drawer-header">
-      <h3 class="drawer-title">Saved Wishlist <span id="wishlistDrawerCount">(0)</span></h3>
+  <aside class="side-drawer" id="wishlistDrawer" aria-label="Wishlist Drawer">
+    <div class="drawer-top">
+      <h3 class="drawer-heading">Saved Wishlist <span id="wishlistDrawerCount">(0)</span></h3>
       <button class="drawer-close-btn" onclick="App.closeWishlist()" aria-label="Close Wishlist">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
 
-    <div class="drawer-body" id="wishlistDrawerBody">
+    <div class="drawer-content-area" id="wishlistDrawerBody">
       <!-- Injected by UI.renderWishlistDrawer() -->
     </div>
   </aside>
 
   <!-- ========================================================================
-       Quick View & Product Detail Modal
+       Product Detail & Quick View Modal
        ======================================================================== -->
-  <div class="modal-backdrop" id="productModalBackdrop" onclick="if(event.target === this) App.closeQuickView()">
-    <div class="product-detail-modal">
-      <button class="modal-close-btn" onclick="App.closeQuickView()" aria-label="Close Product Details">
+  <div class="modal-overlay" id="productDetailModalOverlay" onclick="if(event.target === this) App.closeProductDetail()">
+    <div class="detail-modal-card">
+      <button class="modal-dismiss-btn" onclick="App.closeProductDetail()" aria-label="Close Product Details">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
-      <div id="productModalContent">
+      <div id="productDetailModalBody">
         <!-- Injected by UI.renderProductModal() -->
       </div>
     </div>
   </div>
 
   <!-- ========================================================================
-       Demo Checkout Modal (Multi-Step)
+       Demo Multi-Step Checkout Modal
        ======================================================================== -->
-  <div class="modal-backdrop" id="checkoutModalBackdrop" onclick="if(event.target === this) App.closeCheckout()">
-    <div class="checkout-modal-card">
-      <div class="checkout-header">
-        <div style="font-family: var(--font-serif); font-size: 1.4rem;">LUXE LABEL &bull; PRIVATE CHECKOUT</div>
+  <div class="modal-overlay" id="checkoutModalOverlay" onclick="if(event.target === this) App.closeCheckout()">
+    <div class="checkout-card">
+      <div class="checkout-top-bar">
+        <div style="font-family: var(--font-serif); font-size: 1.35rem; letter-spacing: 0.08em;">
+          LUXE LABEL &bull; PRIVATE CHECKOUT
+        </div>
+        <div class="checkout-demo-tag">FRONTEND DEMO ONLY</div>
         <button class="drawer-close-btn" style="color: #FFFFFF;" onclick="App.closeCheckout()" aria-label="Close Checkout">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
 
-      <div class="checkout-stepper">
-        <div class="step-indicator active" id="stepIndicator1">
-          <span class="step-num">1</span>
-          <span>Delivery</span>
+      <div class="checkout-steps-nav">
+        <div class="checkout-step-pill active" id="chkStepPill1">
+          <span class="checkout-step-num">1</span>
+          <span>Delivery Details</span>
         </div>
-        <div class="step-indicator" id="stepIndicator2">
-          <span class="step-num">2</span>
-          <span>Payment</span>
+        <div class="checkout-step-pill" id="chkStepPill2">
+          <span class="checkout-step-num">2</span>
+          <span>Payment Privilege</span>
         </div>
-        <div class="step-indicator" id="stepIndicator3">
-          <span class="step-num">3</span>
+        <div class="checkout-step-pill" id="chkStepPill3">
+          <span class="checkout-step-num">3</span>
           <span>Confirmation</span>
         </div>
       </div>
 
-      <div class="checkout-body" id="checkoutModalBody">
+      <div class="checkout-inner-body" id="checkoutModalBody">
         <!-- Injected by App.renderCheckoutStep() -->
       </div>
     </div>
   </div>
 
   <!-- ========================================================================
-       Search Overlay Modal
+       Search Overlay Modal (Press / to search)
        ======================================================================== -->
-  <div class="search-modal-backdrop" id="searchModalBackdrop" onclick="if(event.target === this) App.closeSearch()">
-    <div class="search-modal-container">
-      <div class="search-bar-inner">
-        <input type="text" id="searchModalInput" class="search-big-input" placeholder="Search silk lehangas, cashmere trench coats, tuxedos..." autocomplete="off" />
-        <button class="search-close-btn" onclick="App.closeSearch()" aria-label="Close Search">
+  <div class="search-overlay-pane" id="searchOverlay" onclick="if(event.target === this) App.closeSearch()">
+    <div class="search-overlay-box">
+      <div class="search-input-line">
+        <input type="text" id="searchModalInput" class="search-giant-field" placeholder="Search creations, raw silk, tuxedos..." autocomplete="off" />
+        <button class="search-dismiss action-btn" onclick="App.closeSearch()" aria-label="Close Search">
           <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
 
-      <div class="search-tags-row">
-        <span class="search-tag-label">Trending Searches:</span>
-        <button class="search-tag" onclick="App.handleSearchTag('Raw Silk Lehanga')">Raw Silk Lehanga</button>
-        <button class="search-tag" onclick="App.handleSearchTag('Cashmere Coat')">Cashmere Coat</button>
-        <button class="search-tag" onclick="App.handleSearchTag('Navy Tuxedo')">Navy Tuxedo</button>
-        <button class="search-tag" onclick="App.handleSearchTag('Mulberry Silk')">Mulberry Silk</button>
-        <button class="search-tag" onclick="App.handleSearchTag('Linen Resort')">Linen Resort</button>
+      <div class="search-tags-strip">
+        <span style="font-size: 0.68rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--color-accent); font-weight: 600;">Trending Searches:</span>
+        <button class="search-chip-btn" onclick="App.setSearchKeyword('Raw Silk Lehanga')">Raw Silk Lehanga</button>
+        <button class="search-chip-btn" onclick="App.setSearchKeyword('Navy Tuxedo')">Navy Tuxedo</button>
+        <button class="search-chip-btn" onclick="App.setSearchKeyword('Cashmere Trench')">Cashmere Trench</button>
+        <button class="search-chip-btn" onclick="App.setSearchKeyword('Slip Dress')">Slip Dress</button>
+        <button class="search-chip-btn" onclick="App.setSearchKeyword('Linen Shirt')">Linen Shirt</button>
       </div>
 
-      <div class="search-results-list" id="searchResultsList">
-        <!-- Injected dynamically -->
-      </div>
-    </div>
-  </div>
-
-  <!-- ========================================================================
-       Size & Fit Guide Modal
-       ======================================================================== -->
-  <div class="modal-backdrop" id="sizeGuideModalBackdrop" onclick="if(event.target === this) App.closeSizeGuide()">
-    <div class="size-guide-modal">
-      <button class="modal-close-btn" onclick="App.closeSizeGuide()" aria-label="Close Size Guide">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-
-      <span class="eyebrow">Atelier Measurement Matrix</span>
-      <h3 class="serif-font" style="font-size: 2rem; margin-bottom: 0.5rem;">Size & Fit Guide</h3>
-      <p style="font-size: 0.85rem; color: var(--color-noir-muted); margin-bottom: 1.5rem;">
-        All measurements are calibrated to international haute couture standards. For bespoke sizing, contact our private master tailor.
-      </p>
-
-      <table class="size-table">
-        <thead>
-          <tr>
-            <th>Size</th>
-            <th>Bust / Chest (In)</th>
-            <th>Waist (In)</th>
-            <th>Hips (In)</th>
-            <th>Length (In)</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><strong>XS / 36</strong></td>
-            <td>32 - 34</td>
-            <td>26 - 28</td>
-            <td>35 - 37</td>
-            <td>42</td>
-          </tr>
-          <tr>
-            <td><strong>S / 38</strong></td>
-            <td>35 - 37</td>
-            <td>29 - 31</td>
-            <td>38 - 40</td>
-            <td>43</td>
-          </tr>
-          <tr>
-            <td><strong>M / 40</strong></td>
-            <td>38 - 40</td>
-            <td>32 - 34</td>
-            <td>41 - 43</td>
-            <td>44</td>
-          </tr>
-          <tr>
-            <td><strong>L / 42</strong></td>
-            <td>41 - 43</td>
-            <td>35 - 37</td>
-            <td>44 - 46</td>
-            <td>45</td>
-          </tr>
-          <tr>
-            <td><strong>XL / 44</strong></td>
-            <td>44 - 46</td>
-            <td>38 - 40</td>
-            <td>47 - 49</td>
-            <td>46</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <div style="margin-top: 2rem; text-align: center;">
-        <button class="btn btn-primary" onclick="App.closeSizeGuide(); App.openContactModal();">
-          Request Bespoke Measurement Appointment
-        </button>
+      <div class="search-results-tray" id="searchResultsList">
+        <!-- Rendered dynamically -->
       </div>
     </div>
   </div>
 
   <!-- ========================================================================
-       Contact & Private Stylist Modal
+       Policy & Informational Modal (FAQ, Shipping, Returns, Privacy, Terms)
        ======================================================================== -->
-  <div class="modal-backdrop" id="contactModalBackdrop" onclick="if(event.target === this) App.closeContactModal()">
-    <div class="size-guide-modal" style="max-width: 580px;">
-      <button class="modal-close-btn" onclick="App.closeContactModal()" aria-label="Close Contact">
+  <div class="modal-overlay" id="policyModalOverlay" onclick="if(event.target === this) App.closePolicyModal()">
+    <div class="policy-modal-card">
+      <button class="modal-dismiss-btn" onclick="App.closePolicyModal()" aria-label="Close Information">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
-
-      <span class="eyebrow">Private Concierge</span>
-      <h3 class="serif-font" style="font-size: 2rem; margin-bottom: 0.5rem;">Atelier Consultation</h3>
-      <p style="font-size: 0.85rem; color: var(--color-noir-muted); margin-bottom: 1.5rem;">
-        Reserve a private 1-on-1 session with our senior fashion director or request custom bespoke bridal/ceremonial alterations.
-      </p>
-
-      <form id="contactForm">
-        <div class="checkout-form-grid">
-          <div class="form-group">
-            <label class="input-label">Your Name *</label>
-            <input type="text" class="luxury-input" required placeholder="Lord / Lady / Connoisseur" />
-          </div>
-          <div class="form-group">
-            <label class="input-label">Phone / WhatsApp *</label>
-            <input type="tel" class="luxury-input" required placeholder="+91 98765 43210" />
-          </div>
-          <div class="form-group form-group-full">
-            <label class="input-label">Email Address *</label>
-            <input type="email" class="luxury-input" required placeholder="patron@domain.com" />
-          </div>
-          <div class="form-group form-group-full">
-            <label class="input-label">Preferred Boutique Location</label>
-            <select class="luxury-input">
-              <option>Mumbai - Altamount Road Salon</option>
-              <option>New Delhi - Chanakyapuri Salon</option>
-              <option>Virtual Private Styling Video Session</option>
-            </select>
-          </div>
-          <div class="form-group form-group-full">
-            <label class="input-label">Bespoke Inquiries / Notes</label>
-            <textarea class="luxury-input" rows="3" placeholder="Tell us about the occasion, silhouette preferences, or custom sizing requests..."></textarea>
-          </div>
-        </div>
-
-        <div style="margin-top: 1.75rem; text-align: right;">
-          <button type="submit" class="btn btn-primary" style="width: 100%;">
-            Confirm Private Consultation Request
-          </button>
-        </div>
-      </form>
+      <div id="policyModalBody">
+        <!-- Injected dynamically by App.openPolicyModal(type) -->
+      </div>
     </div>
   </div>
 
@@ -681,37 +622,37 @@
        Mobile Navigation Slide Drawer
        ======================================================================== -->
   <div class="drawer-backdrop" id="mobileNavBackdrop" onclick="App.closeMobileNav()"></div>
-  <aside class="mobile-nav-drawer" id="mobileNavDrawer" aria-label="Mobile Navigation">
-    <div class="mobile-nav-header">
-      <div class="brand-logo" style="font-size: 1.4rem;">LUXE LABEL</div>
-      <button class="drawer-close-btn" onclick="App.closeMobileNav()" aria-label="Close Navigation">
+  <aside class="mobile-drawer-sheet" id="mobileNavDrawer" aria-label="Mobile Navigation Drawer">
+    <div class="mobile-drawer-header">
+      <div class="header-logo" style="font-size: 1.45rem;">LUXE LABEL</div>
+      <button class="drawer-close-btn" onclick="App.closeMobileNav()" aria-label="Close Menu">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
 
-    <nav class="mobile-nav-links">
-      <a href="#hero" class="mobile-nav-link" onclick="App.closeMobileNav()">Home</a>
-      <a href="#catalogSection" class="mobile-nav-link" onclick="App.closeMobileNav(); App.handleCategoryFilter('Women');">Women's Atelier</a>
-      <a href="#catalogSection" class="mobile-nav-link" onclick="App.closeMobileNav(); App.handleCategoryFilter('Men');">Men's Sartorial</a>
-      <a href="#catalogSection" class="mobile-nav-link" onclick="App.closeMobileNav(); App.handleCategoryFilter('Ethnic Wear');">Royal Ethnic</a>
-      <a href="#curatedCollections" class="mobile-nav-link" onclick="App.closeMobileNav()">Collections</a>
-      <a href="#newsletter" class="mobile-nav-link" onclick="App.closeMobileNav()">Private Gazette</a>
-      <a href="javascript:void(0)" class="mobile-nav-link" onclick="App.closeMobileNav(); App.openContactModal();">Contact Atelier</a>
+    <nav class="mobile-drawer-links">
+      <a href="#hero" class="mobile-drawer-link" onclick="App.closeMobileNav()">Home</a>
+      <a href="#catalogSection" class="mobile-drawer-link" onclick="App.closeMobileNav(); App.handleDepartmentFilter('Women');">Women</a>
+      <a href="#catalogSection" class="mobile-drawer-link" onclick="App.closeMobileNav(); App.handleDepartmentFilter('Men');">Men</a>
+      <a href="#categorySection" class="mobile-drawer-link" onclick="App.closeMobileNav()">Collections</a>
+      <a href="#newArrivalsSection" class="mobile-drawer-link" onclick="App.closeMobileNav()">New Arrivals</a>
+      <a href="#catalogSection" class="mobile-drawer-link" style="color: var(--color-sale);" onclick="App.closeMobileNav(); App.handleCategoryFilter('all'); document.getElementById('chkSaleOnly').click();">Sale</a>
+      <a href="javascript:void(0)" class="mobile-drawer-link" onclick="App.closeMobileNav(); App.openPolicyModal('contact');">Private Salons</a>
     </nav>
 
-    <div class="mobile-nav-footer">
-      <div style="margin-bottom: 0.5rem; font-weight: 600; color: var(--color-noir);">Private Concierge</div>
+    <div class="mobile-drawer-footer">
+      <div style="font-weight: 600; color: var(--color-text); margin-bottom: 0.4rem;">Private Concierge</div>
       <div>+91 (022) 8800-LUXE</div>
       <div>concierge@luxelabel.com</div>
     </div>
   </aside>
 
   <!-- ========================================================================
-       Toast Notification Container
+       Toast Notification Shelf
        ======================================================================== -->
-  <div class="toast-container" id="toastContainer"></div>
+  <div class="toast-shelf" id="toastShelf"></div>
 
-  <!-- Scripts -->
+  <!-- Application Scripts -->
   <script src="js/products.js"></script>
   <script src="js/state.js"></script>
   <script src="js/ui.js"></script>

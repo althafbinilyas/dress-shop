@@ -1,26 +1,30 @@
-// LUXE LABEL - State Management & LocalStorage Persistence
+// LUXE LABEL - State Store & LocalStorage Persistence
+// Handles Shopping Bag with variant merging (size + color), Wishlist, Filters, and PIN checker.
 
 class LuxeStore {
   constructor() {
     this.STORAGE_KEYS = {
-      CART: 'luxelabel_cart_v1',
-      WISHLIST: 'luxelabel_wishlist_v1',
-      RECENTLY_VIEWED: 'luxelabel_recently_viewed_v1'
+      CART: 'luxelabel_cart_v2',
+      WISHLIST: 'luxelabel_wishlist_v2',
+      RECENTLY_VIEWED: 'luxelabel_recent_v2',
+      NEWSLETTER: 'luxelabel_newsletter_v2'
     };
 
     this.cart = this.loadCart();
     this.wishlist = this.loadWishlist();
     this.recentlyViewed = this.loadRecentlyViewed();
     this.appliedDiscount = null; // { code: 'LUXE10', percent: 10 }
-    this.includeGiftBox = false;
+    this.FREE_SHIPPING_THRESHOLD = 2999;
+    this.STANDARD_SHIPPING = 250;
 
     this.filters = {
-      category: 'all',
-      gender: 'all',
-      tag: 'all',
-      sortBy: 'featured',
+      department: 'all', // 'all', 'Women', 'Men'
+      category: 'all',   // 'all', 'Dresses', 'Tailoring', 'Shirts', 'Trousers', 'Ethnic Edit'
+      size: 'all',       // 'all', 'XS', 'S', 'M', 'L', 'XL'
+      sortBy: 'featured', // 'featured', 'newest', 'price-low', 'price-high'
       searchQuery: '',
-      priceRange: [0, 100000]
+      priceMax: 15000,
+      saleOnly: false
     };
 
     this.listeners = [];
@@ -32,7 +36,7 @@ class LuxeStore {
       const data = localStorage.getItem(this.STORAGE_KEYS.CART);
       return data ? JSON.parse(data) : [];
     } catch (e) {
-      console.warn("Could not load cart from localStorage", e);
+      console.warn("Failed to load cart from storage", e);
       return [];
     }
   }
@@ -40,9 +44,7 @@ class LuxeStore {
   saveCart() {
     try {
       localStorage.setItem(this.STORAGE_KEYS.CART, JSON.stringify(this.cart));
-    } catch (e) {
-      console.warn("Could not save cart", e);
-    }
+    } catch (e) {}
     this.notify();
   }
 
@@ -51,7 +53,6 @@ class LuxeStore {
       const data = localStorage.getItem(this.STORAGE_KEYS.WISHLIST);
       return data ? JSON.parse(data) : [];
     } catch (e) {
-      console.warn("Could not load wishlist", e);
       return [];
     }
   }
@@ -59,9 +60,7 @@ class LuxeStore {
   saveWishlist() {
     try {
       localStorage.setItem(this.STORAGE_KEYS.WISHLIST, JSON.stringify(this.wishlist));
-    } catch (e) {
-      console.warn("Could not save wishlist", e);
-    }
+    } catch (e) {}
     this.notify();
   }
 
@@ -91,78 +90,83 @@ class LuxeStore {
     this.listeners.forEach(fn => fn(this));
   }
 
-  // --- Cart Actions ---
-  addToCart(product, size = null, quantity = 1) {
+  // --- Shopping Bag (Cart) Operations ---
+  // Merges identical variants: same product id + size + color
+  // Different sizes or colors form distinct line items
+  addToCart(product, size = null, color = null, quantity = 1) {
     const selectedSize = size || (product.sizes && product.sizes.length ? product.sizes[0] : 'Standard');
-    const existingIndex = this.cart.findIndex(
-      item => item.product.id === product.id && item.size === selectedSize
-    );
+    const selectedColor = color || (product.colors && product.colors.length ? product.colors[0].name : 'Standard');
+
+    const variantId = `${product.id}-${selectedSize}-${selectedColor}`;
+
+    const existingIndex = this.cart.findIndex(item => item.variantId === variantId);
 
     if (existingIndex > -1) {
-      this.cart[existingIndex].quantity += quantity;
+      const currentQty = this.cart[existingIndex].quantity;
+      const newQty = currentQty + quantity;
+      // Cap at product stock if defined
+      if (product.stock && newQty > product.stock) {
+        this.cart[existingIndex].quantity = product.stock;
+        this.saveCart();
+        return { success: true, capped: true, message: `Only ${product.stock} pieces available in atelier.` };
+      }
+      this.cart[existingIndex].quantity = newQty;
     } else {
       this.cart.push({
+        variantId: variantId,
         product: product,
         size: selectedSize,
-        quantity: quantity,
+        color: selectedColor,
+        quantity: Math.min(quantity, product.stock || 99),
         addedAt: Date.now()
       });
     }
 
     this.saveCart();
-    return true;
+    return { success: true, capped: false, message: `Added to Shopping Bag.` };
   }
 
-  updateQuantity(productId, size, quantity) {
-    const itemIndex = this.cart.findIndex(
-      item => item.product.id === productId && item.size === size
-    );
-
+  updateQuantity(variantId, quantity) {
+    const itemIndex = this.cart.findIndex(item => item.variantId === variantId);
     if (itemIndex > -1) {
       if (quantity <= 0) {
         this.cart.splice(itemIndex, 1);
       } else {
-        this.cart[itemIndex].quantity = quantity;
+        const product = this.cart[itemIndex].product;
+        const maxStock = product.stock || 99;
+        this.cart[itemIndex].quantity = Math.min(quantity, maxStock);
       }
       this.saveCart();
     }
   }
 
-  removeFromCart(productId, size) {
-    this.cart = this.cart.filter(
-      item => !(item.product.id === productId && item.size === size)
-    );
+  removeFromCart(variantId) {
+    this.cart = this.cart.filter(item => item.variantId !== variantId);
     this.saveCart();
   }
 
   clearCart() {
     this.cart = [];
     this.appliedDiscount = null;
-    this.includeGiftBox = false;
     this.saveCart();
   }
 
-  setGiftBox(enabled) {
-    this.includeGiftBox = enabled;
-    this.notify();
-  }
-
   applyPromoCode(code) {
-    const cleanCode = (code || '').trim().toUpperCase();
-    if (cleanCode === 'LUXE10') {
+    const clean = (code || '').trim().toUpperCase();
+    if (clean === 'LUXE10') {
       this.appliedDiscount = { code: 'LUXE10', percent: 10, label: '10% Inaugural Privilege' };
       this.notify();
       return { success: true, message: '10% privilege discount applied!' };
-    } else if (cleanCode === 'ROYAL5000') {
+    } else if (clean === 'ROYAL500') {
       const subtotal = this.getCartSubtotal();
-      if (subtotal < 30000) {
-        return { success: false, message: 'ROYAL5000 requires minimum cart value of ₹30,000' };
+      if (subtotal < 2999) {
+        return { success: false, message: 'ROYAL500 requires a minimum order value of ₹2,999' };
       }
-      this.appliedDiscount = { code: 'ROYAL5000', flat: 5000, label: '₹5,000 Royal Patronage' };
+      this.appliedDiscount = { code: 'ROYAL500', flat: 500, label: '₹500 Patron Reward' };
       this.notify();
-      return { success: true, message: '₹5,000 Royal Patronage applied!' };
+      return { success: true, message: '₹500 reward applied!' };
     } else {
-      return { success: false, message: 'Invalid or expired promotional code' };
+      return { success: false, message: 'Invalid promotional code.' };
     }
   }
 
@@ -194,12 +198,8 @@ class LuxeStore {
   getShippingCost() {
     const subtotal = this.getCartSubtotal();
     if (subtotal === 0) return 0;
-    // Complimentary White Glove shipping above ₹15,000
-    return subtotal >= 15000 ? 0 : 950;
-  }
-
-  getGiftBoxCost() {
-    return this.includeGiftBox ? 450 : 0;
+    // Free shipping on orders over ₹2,999
+    return subtotal >= this.FREE_SHIPPING_THRESHOLD ? 0 : this.STANDARD_SHIPPING;
   }
 
   getCartTotal() {
@@ -207,11 +207,10 @@ class LuxeStore {
     if (subtotal === 0) return 0;
     const discount = this.getDiscountAmount();
     const shipping = this.getShippingCost();
-    const giftBox = this.getGiftBoxCost();
-    return Math.max(0, subtotal - discount + shipping + giftBox);
+    return Math.max(0, subtotal - discount + shipping);
   }
 
-  // --- Wishlist Actions ---
+  // --- Wishlist Operations ---
   toggleWishlist(productId) {
     const index = this.wishlist.indexOf(productId);
     let added = false;
@@ -238,10 +237,46 @@ class LuxeStore {
   addRecentlyViewed(productId) {
     this.recentlyViewed = this.recentlyViewed.filter(id => id !== productId);
     this.recentlyViewed.unshift(productId);
-    if (this.recentlyViewed.length > 8) {
+    if (this.recentlyViewed.length > 6) {
       this.recentlyViewed.pop();
     }
     this.saveRecentlyViewed();
+  }
+
+  // --- Delivery PIN Checker ---
+  checkDeliveryPincode(pin) {
+    const clean = (pin || '').trim();
+    if (!/^\d{6}$/.test(clean)) {
+      return {
+        valid: false,
+        message: 'Please enter a valid 6-digit Indian PIN code.'
+      };
+    }
+
+    // Realistic demo fulfillment calculation
+    const isMetro = ['11', '40', '56', '70', '60', '50'].includes(clean.substring(0, 2));
+    const days = isMetro ? '2 business days' : '3-4 business days';
+
+    return {
+      valid: true,
+      pin: clean,
+      deliveryTime: days,
+      message: `Delivery available to ${clean} within ${days}. Free White-Glove Shipping on orders above ₹2,999.`
+    };
+  }
+
+  // --- Newsletter Storage ---
+  subscribeNewsletter(email) {
+    try {
+      const list = JSON.parse(localStorage.getItem(this.STORAGE_KEYS.NEWSLETTER) || '[]');
+      if (!list.includes(email)) {
+        list.push(email);
+        localStorage.setItem(this.STORAGE_KEYS.NEWSLETTER, JSON.stringify(list));
+      }
+      return true;
+    } catch (e) {
+      return true;
+    }
   }
 
   // --- Filtering & Sorting ---
@@ -252,12 +287,13 @@ class LuxeStore {
 
   resetFilters() {
     this.filters = {
+      department: 'all',
       category: 'all',
-      gender: 'all',
-      tag: 'all',
+      size: 'all',
       sortBy: 'featured',
       searchQuery: '',
-      priceRange: [0, 100000]
+      priceMax: 15000,
+      saleOnly: false
     };
     this.notify();
   }
@@ -265,25 +301,35 @@ class LuxeStore {
   getFilteredProducts() {
     let result = [...PRODUCTS_DATA];
 
-    // Category filter
+    // Department (Women / Men)
+    if (this.filters.department !== 'all') {
+      result = result.filter(item => 
+        item.department.toLowerCase() === this.filters.department.toLowerCase()
+      );
+    }
+
+    // Category (Dresses, Tailoring, Shirts, Trousers, Ethnic Edit)
     if (this.filters.category !== 'all') {
       result = result.filter(item => 
         item.category.toLowerCase() === this.filters.category.toLowerCase()
       );
     }
 
-    // Gender filter
-    if (this.filters.gender !== 'all') {
+    // Size filter
+    if (this.filters.size !== 'all') {
       result = result.filter(item => 
-        item.gender.toLowerCase() === this.filters.gender.toLowerCase()
+        item.sizes.some(s => s.toLowerCase() === this.filters.size.toLowerCase())
       );
     }
 
-    // Tag filter
-    if (this.filters.tag !== 'all') {
-      result = result.filter(item => 
-        item.tags.some(t => t.toLowerCase() === this.filters.tag.toLowerCase())
-      );
+    // Sale only
+    if (this.filters.saleOnly) {
+      result = result.filter(item => item.onSale);
+    }
+
+    // Price Max
+    if (this.filters.priceMax) {
+      result = result.filter(item => item.price <= this.filters.priceMax);
     }
 
     // Search query
@@ -292,13 +338,14 @@ class LuxeStore {
       result = result.filter(item => 
         item.name.toLowerCase().includes(q) ||
         item.category.toLowerCase().includes(q) ||
+        item.department.toLowerCase().includes(q) ||
         item.description.toLowerCase().includes(q) ||
         item.fabric.toLowerCase().includes(q) ||
         item.tags.some(t => t.toLowerCase().includes(q))
       );
     }
 
-    // Price sorting
+    // Sorting
     switch (this.filters.sortBy) {
       case 'price-low':
         result.sort((a, b) => a.price - b.price);
@@ -306,15 +353,12 @@ class LuxeStore {
       case 'price-high':
         result.sort((a, b) => b.price - a.price);
         break;
-      case 'rating':
-        result.sort((a, b) => b.rating - a.rating);
-        break;
       case 'newest':
         result.sort((a, b) => (b.badge === 'New Arrival' ? 1 : 0) - (a.badge === 'New Arrival' ? 1 : 0));
         break;
       case 'featured':
       default:
-        // Default curated order
+        // Curated editorial order
         break;
     }
 
